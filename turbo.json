@@ -1,0 +1,15 @@
+{
+	"$schema": "https://turborepo.dev/schema.json",
+	"ui": "tui",
+	"tasks": {
+		"build": {
+			"dependsOn": [ "^build" ],
+			"outputs": [ "build/**" ],
+			"env": [ "NODE_ENV", "HOST", "PORT" ]
+		},
+		"dev": {
+			"cache": false,
+			"persistent": true
+		}
+	}
+}

@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"rootDir": "./src",
+		"outDir": "./build",
+        "target": "es2025",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+		"lib": ["esnext"],
+		"types": ["node"],
+		"noUncheckedIndexedAccess": true,
+		"strict": false,
+		"noImplicitReturns": true,
+		"noImplicitOverride": true,
+		"noPropertyAccessFromIndexSignature": false,
+		"skipLibCheck": true,
+		"emitDecoratorMetadata": true,
+        "experimentalDecorators": true
+	}
+}
