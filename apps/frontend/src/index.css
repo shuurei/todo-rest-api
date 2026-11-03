@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+    --font-roboto: 'Roboto', sans-serif;
+    --animate-blink: blink 1s step-start infinite;
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
+}
+
+@layer base {
+    body {
+        @apply bg-[#080c08] min-h-svh font-roboto w-full flex justify-center;
+    }
+
+    #root {
+        @apply w-full flex flex-col;
+    }
+}

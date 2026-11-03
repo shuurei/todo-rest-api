@@ -61,5 +61,5 @@ try {
         console.log('━'.repeat(35));
     });
 } catch (err) {
-    console.log('Database: ', err);
+    console.error('Database: ', err);
 }
