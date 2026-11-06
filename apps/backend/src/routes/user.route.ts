@@ -5,6 +5,8 @@ import { authMiddleware } from '../middlewares/auth.middleware'
 import { resolveMe } from '../middlewares/resolve-me.middleware'
 import { validateBody } from '../middlewares/validate.middleware'
 import { updateUserSchema } from '../validators/user.schema'
+import { TodoController } from '../controllers/todo.controller'
+import { createTodoSchema, updateTodoSchema } from '../validators/todo.schema'
 
 const router = Router();
 
@@ -122,5 +124,10 @@ router.patch('/:userId', [resolveMe, validateBody(updateUserSchema)], UserContro
  *         $ref: '#/components/responses/InternalServerError'
  */
 router.delete('/:userId', resolveMe, UserController.remove);
+
+router.get('/:userId/todos', resolveMe, TodoController.list);
+router.post('/:userId/todos', [resolveMe, validateBody(createTodoSchema)], TodoController.create);
+router.patch('/:userId/todos/:todoId', [resolveMe, validateBody(updateTodoSchema)], TodoController.update);
+router.delete('/:userId/todos/:todoId', resolveMe, TodoController.remove);
 
 export default router;

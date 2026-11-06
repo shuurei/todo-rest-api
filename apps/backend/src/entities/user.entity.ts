@@ -1,5 +1,6 @@
 import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
 import { Session } from './session.entity'
+import { Todo } from './todo.entity';
 
 @Entity()
 export class User {
@@ -26,4 +27,7 @@ export class User {
 
     @OneToMany(() => Session, (session) => session)
     sessions: Session[];
+
+    @OneToMany(() => Todo, (todo) => todo)
+    todos: Todo[];
 }
