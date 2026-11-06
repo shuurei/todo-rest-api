@@ -12,7 +12,23 @@ export class AuthService {
         return AppDataSource.getRepository(Session);
     }
 
-    static async register(data: CreateUserInput) {
+    static async generateSession(userId: string, userAgent: string | null) {
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        const token = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+        const session = this.repo.create({
+            userId,
+            token,
+            expiresAt,
+            userAgent
+        });
+
+        await this.repo.save(session);
+
+        return token;
+    }
+
+    static async register(data: CreateUserInput, userAgent: string | null) {
         const existing = await UserService.repo.findOneBy({ username: data.username });
         if (existing) {
             throw new HttpConflictError('USERNAME_ALREADY_EXISTS');
@@ -21,11 +37,14 @@ export class AuthService {
         const user = await UserService.create(data);
         delete user.password;
 
-        return user;
+        return {
+            token: await this.generateSession(user.id, userAgent),
+            user
+        };
     }
 
-    static async login(email: string, password: string, userAgent: string | null) {
-        const user = await UserService.findByEmailWithPassword(email);
+    static async login(username: string, password: string, userAgent: string | null) {
+        const user = await UserService.findByUsernameWithPassword(username);
         if (!user) {
             throw new HttpUnauthorizedError('INVALID_CREDENTIALS');
         }
@@ -36,20 +55,11 @@ export class AuthService {
         }
 
         delete user.password;
-    
-        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-        const session = this.repo.create({
-            userId: user.id,
-            token,
-            expiresAt,
-            userAgent
-        });
-
-        await this.repo.save(session);
-
-        return { token, user };
+        return {
+            token: await this.generateSession(user.id, userAgent),
+            user
+        };
     }
 
     static async logout(userId: string, token: string) {

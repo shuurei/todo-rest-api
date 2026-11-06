@@ -14,7 +14,7 @@
 
 @layer base {
     body {
-        @apply bg-[#080c08] min-h-svh font-roboto w-full flex justify-center;
+        @apply font-mono bg-[#080c08] min-h-svh font-roboto w-full flex justify-center;
     }
 
     #root {

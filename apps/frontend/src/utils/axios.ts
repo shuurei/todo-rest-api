@@ -1,8 +1,8 @@
-import { useAuthStore } from '@/stores/auth.store'
+import { useAuthStore } from '@/stores/useAuthStore'
 import axios from 'axios'
 
 export const api = axios.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://localhost:3000/api',
     withCredentials: true,
     headers: { 'Content-Type': 'application/json' }
 });
@@ -21,5 +21,5 @@ api.interceptors.response.use((res) => res.data, (err) => {
         useAuthStore.getState().logout();
     }
 
-    return Promise.reject(err);
+    return Promise.reject(err.response.data);
 });

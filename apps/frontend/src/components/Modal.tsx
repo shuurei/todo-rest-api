@@ -4,7 +4,7 @@ import { cn } from '@/utils/cn'
 Modal.Header = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
     return (
         <div {...props} className={cn(
-            'flex border-b border-[#5b9c3b]/30 bg-[#5b9c3b]/6 px-5 py-3',
+            'sticky top-0 z-20 flex border-b border-[#5b9c3b]/30 bg-[#101910] px-5 py-3',
             className
         )}>
             {children}
@@ -14,7 +14,7 @@ Modal.Header = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivE
 
 Modal.Content = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
     return (
-        <div {...props} className={cn('px-5 py-7 sm:p-8', className)}>
+        <div {...props} className={cn('px-5 py-7 sm:p-8 overflow-visible', className)}>
             {children}
         </div>
     );
@@ -43,7 +43,7 @@ export function Modal({ children, className, ...props }: HTMLMotionProps<'div'>)
                     times: [0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]
                 }}
                 className={cn(
-                    'border overflow-hidden border-[#5b9c3b]/40 bg-[#101910]/90 border-y',
+                    'relative border overflow-hidden border-[#5b9c3b]/40 bg-[#101910]/90 border-y min-h-0 overflow-y-auto',
                     className
                 )}
             >

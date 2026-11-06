@@ -73,10 +73,6 @@ router.get('/:userId', resolveMe, UserController.show);
  *               username:
  *                 type: string
  *                 example: "admin"
- *               email:
- *                 type: string
- *                 format: email
- *                 example: "user@example.com"
  *     responses:
  *       '200':
  *         description: User successfully updated

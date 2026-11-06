@@ -7,15 +7,15 @@ import { LoginInput } from '../validators/auth.schema'
 export class AuthController {
     static async register(req: Request<{}, {}, CreateUserInput>, res: Response) {
         return res.status(201).json({
-            data: await AuthService.register(req.body)
+            data: await AuthService.register(req.body, req.headers['user-agent'] ?? null)
         });
     }
 
     static async login(req: Request<{}, {}, LoginInput>, res: Response) {
-        const { email, password } = req.body;
+        const { username, password } = req.body;
 
         return res.status(200).json({
-            data: await AuthService.login(email, password, req.headers['user-agent'] ?? null)
+            data: await AuthService.login(username, password, req.headers['user-agent'] ?? null)
         });
     }
 

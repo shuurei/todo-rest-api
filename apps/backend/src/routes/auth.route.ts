@@ -21,16 +21,11 @@ const router = Router();
  *             type: object
  *             required:
  *               - username
- *               - email
  *               - password
  *             properties:
  *               username:
  *                 type: string
  *                 example: "admin"
- *               email:
- *                 type: string
- *                 format: email
- *                 example: "user@example.com"
  *               password:
  *                 type: string
  *                 format: password
@@ -52,7 +47,7 @@ router.post('/register', validateBody(createUserSchema), AuthController.register
  * /api/auth/login:
  *   post:
  *     summary: Authenticate a user
- *     description: Authenticate a user using their email address and password.
+ *     description: Authenticate a user using their username and password
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -61,13 +56,12 @@ router.post('/register', validateBody(createUserSchema), AuthController.register
  *           schema:
  *             type: object
  *             required:
- *               - email
+ *               - username
  *               - password
  *             properties:
- *               email:
+ *               username:
  *                 type: string
- *                 format: email
- *                 example: "user@example.com"
+ *                 example: "admin"
  *               password:
  *                 type: string
  *                 format: password

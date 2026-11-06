@@ -1,9 +1,8 @@
 import z from 'zod'
-
-export const passwordSchema = process.env.NODE_ENV === 'DEV' ? z.string() : z.string().min(8)
+import { passwordSchema, usernameSchema } from './user.schema'
 
 export const loginSchema = z.object({
-    email: z.email(),
+    username: usernameSchema,
     password: passwordSchema
 });
 

@@ -33,11 +33,11 @@ export class UserService {
         return await this.repo.save(user);
     }
 
-    static async findByEmailWithPassword(email: string) {
+    static async findByUsernameWithPassword(username: string) {
         return await UserService.repo
             .createQueryBuilder('user')
             .addSelect('user.password')
-            .where('user.email = :email', { email })
+            .where('user.username = :username', { username })
             .getOne();
     }
 

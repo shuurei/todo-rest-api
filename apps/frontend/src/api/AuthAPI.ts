@@ -4,12 +4,11 @@ import { api } from '@/utils/axios'
 
 export interface RegisterPayload {
     username: string;
-    email: string;
     password: string;
 }
 
 export interface LoginPayload {
-    email: string;
+    username: string;
     password: string;
 }
 
@@ -23,8 +22,12 @@ export class AuthAPI {
         return api;
     }
 
+    static async check() {
+        return await api.get('/users/@me');
+    }
+
     static async register(payload: RegisterPayload) {
-        return await api.post<ApiResponse<User>>('/auth/register', payload);
+        return await api.post<ApiResponse<LoginResponseData>>('/auth/register', payload);
     }
 
     static async login(payload: LoginPayload) {

@@ -7,7 +7,7 @@ interface ScrambleTextOwnProps {
 }
 
 type ScrambleTextProps<T extends ElementType = 'span'> = ScrambleTextOwnProps & {
-    as?: T
+    as?: T;
 } & Omit<ComponentPropsWithoutRef<T>, keyof ScrambleTextOwnProps | 'as'>
 
 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+-_';

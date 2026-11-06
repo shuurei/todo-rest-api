@@ -48,11 +48,6 @@ export const schemas = {
                 type: 'string',
                 example: 'admin'
             },
-            email: {
-                type: 'string',
-                format: 'email',
-                example: 'user@example.com'
-            },
             updatedAt: {
                 type: 'string',
                 format: 'date-time',

@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 import { AppDataSource } from './db'
 import swaggerUi from 'swagger-ui-express'
 import { swaggerSpec } from './swagger/spec'
@@ -31,6 +32,16 @@ try {
 
     const port = Number(process.env.PORT) || 3000;
     const app = express();
+
+    app.use(cors({
+        origin: [
+            'http://localhost:5173',
+            'http://localhost:3000',
+            'http://127.0.0.1:5173'
+        ],
+        credentials: true
+    }));
+
     app.use(express.json());
 
     app.get('/health', (_req, res) => {

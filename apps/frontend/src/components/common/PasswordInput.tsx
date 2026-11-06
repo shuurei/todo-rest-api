@@ -6,11 +6,19 @@ import ScrambleText from '../ScrambleText'
 
 interface PasswordInputProps extends InputHTMLAttributes<HTMLInputElement> {
     label: string;
-    error?: string;
+    error?: string | null;
+    showLabelError?: boolean;
 }
 
-export default function PasswordInput({ label, error, id, className, ...props }: PasswordInputProps) {
-    const [visible, setVisible] = useState(false)
+export default function PasswordInput({
+    id,
+    label,
+    error,
+    showLabelError = true,
+    className,
+    ...props
+}: PasswordInputProps) {
+    const [visible, setVisible] = useState(false);
 
     return (
         <div className='space-y-3'>
@@ -26,7 +34,7 @@ export default function PasswordInput({ label, error, id, className, ...props }:
                             'px-4 py-3 pr-16 font-mono text-sm text-[#c5e6ad] outline-none',
                             'placeholder:text-[#49633e]',
                             'focus:border-[#8bc66a] focus:ring-1 focus:ring-[#8bc66a]/30',
-                            error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
+                            error && 'bg-[#1a0707] placeholder:text-[#633e3e] text-[#e6adad] border-red-500 focus:border-red-500 focus:ring-red-500/20',
                             className
                         )}
                         {...props}
@@ -34,22 +42,26 @@ export default function PasswordInput({ label, error, id, className, ...props }:
 
                     <ScrambleText
                         as='button'
+                        type='button'
                         onClick={(event) => {
                             event.preventDefault();
-                            setVisible(value => !value)
+                            setVisible((value) => !value);
                         }}
-                        className='absolute inset-y-0 right-4 text-xs font-medium text-zinc-500 transition hover:text-[#c5e6ad] cursor-pointer'
+                        className={cn(
+                            'absolute inset-y-0 right-4 text-xs font-medium text-zinc-500 transition hover:text-[#c5e6ad] cursor-pointer',
+                            error && 'hover:text-[#e6adad]'
+                        )}
                         text={visible ? '[HIDE]' : '[SHOW]'}
                         duration={500}
                     />
                 </div>
             </label>
 
-            {error && (
+            {(showLabelError && (error && error.length > 0)) && (
                 <ScrambleText
-                    className='text-red-400 text-xs'
-                    text={error}
                     as='p'
+                    className='text-red-400 text-xs mt-1.5'
+                    text={error}
                 />
             )}
         </div>
