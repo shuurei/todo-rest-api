@@ -1,11 +1,14 @@
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useAuth } from '@/contexts/AuthContext'
 import { createContext, useContext, useMemo, useState } from 'react'
-import { LuCheck, LuSlidersHorizontal, LuUser } from 'react-icons/lu'
+import type { IconType } from 'react-icons'
+import { useTranslation } from 'react-i18next'
+import { hasFlag, UserFlags } from '@todo/shared'
+import { LuCheck, LuShieldCheck, LuSlidersHorizontal, LuUser } from 'react-icons/lu'
 
 export interface MiniApp {
     name: string;
     path: string;
-    icon: React.ReactNode;
+    Icon: IconType;
 }
 
 export interface MiniAppOrigin {
@@ -30,26 +33,37 @@ export interface MiniAppContextType {
 const MiniAppContext = createContext<MiniAppContextType | null>(null);
 
 export const MiniAppProvider = ({ children }: { children: React.ReactNode }) => {
+    const { t } = useTranslation();
     const [miniAppState, setMiniAppState] = useState<MiniAppState | null>(null);
-    const username = useAuthStore((state) => state.user?.username);
+    const { user } = useAuth();
 
-    const apps = useMemo<MiniApp[]>(() => [
-        {
-            name: 'Todos',
+    const apps = useMemo<MiniApp[]>(() => {
+        const apps = [{
+            name: t('apps.todos'),
             path: '/todos',
-            icon: <LuCheck />
+            Icon: LuCheck
         },
         {
-            name: username ?? 'Account',
+            name: user?.username ?? t('apps.account'),
             path: '/account',
-            icon: <LuUser />
+            Icon: LuUser
         },
         {
-            name: 'Settings',
+            name: t('apps.settings'),
             path: '/settings',
-            icon: <LuSlidersHorizontal />
-        },
-    ], [username]);
+            Icon: LuSlidersHorizontal
+        }]
+
+        if (user && hasFlag(user.flags, UserFlags.ADMIN)) {
+            apps.unshift({
+                name: t('apps.admin'),
+                path: '/admin',
+                Icon: LuShieldCheck
+            });
+        }
+
+        return apps;
+    }, [user?.username, user?.flags, t]);
 
     const value = useMemo(() => ({
         apps,

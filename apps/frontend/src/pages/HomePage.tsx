@@ -5,7 +5,8 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useWindowSize } from '@/hooks/useWindowSize'
 import { useMiniApp, type MiniApp } from '@/contexts/MiniAppContext'
 import { cn } from '@/utils/cn'
-import { useAppStore } from '@/stores/useAppStore'
+import { useAuth } from '@/contexts/AuthContext'
+import { defaultUserPreferences } from '@todo/shared'
 
 export default function HomePage() {
     const navigate = useNavigate();
@@ -13,7 +14,8 @@ export default function HomePage() {
     const { apps, miniAppState, openMiniApp, updateMiniAppOrigin, clearMiniApp } = useMiniApp();
     const { centerX, centerY, widthScreen, heightScreen } = useWindowSize();
 
-    const settings = useAppStore((state) => state.settings);
+    const { user } = useAuth();
+    const settings = user?.preferences ?? defaultUserPreferences;
     const appRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
     useEffect(() => {
@@ -45,25 +47,28 @@ export default function HomePage() {
     }
 
     return (
-        <section className='relative flex h-full flex-col gap-8 overflow-y-auto p-6 font-mono text-[#c5e6ad]'>
+        <section className='relative flex h-full flex-col gap-8 overflow-y-auto p-6 font-mono text-theme-text'>
             <div className='flex flex-wrap justify-center gap-8'>
                 {apps.map((app) => (
                     <Link
                         key={app.path}
                         to={app.path}
-                        onClick={(event) => handleOpenMiniApp(event, app)}
+                        onClick={(event) => handleOpenMiniApp(event, Object.assign(app))}
                         className={cn(
                             'group flex flex-col items-center gap-3 text-center',
                             {
-                                'opacity-0': app.name == miniAppState?.name,
-                                'animate-pulse': miniAppState && (app.name !== miniAppState?.name)
+                                'opacity-0': app.path === miniAppState?.path,
+                                'animate-pulse': miniAppState && (app.path !== miniAppState?.path)
                             }
                         )}
                     >
-                        <div ref={(element) => {
-                            appRefs.current[app.path] = element;
-                        }} className='size-18 relative flex aspect-square w-full max-w-25 items-center justify-center border border-[#5b9c3b]/30 bg-[#080e08] text-[#82aa6b] transition-all duration-200 group-hover:-translate-y-1 group-hover:border-[#8bc66a] group-hover:bg-[#101b0e] group-hover:text-[#c5e6ad]'>
-                            {app.icon}
+                        <div
+                            ref={(element) => {
+                                appRefs.current[app.path] = element;
+                            }}
+                            className='size-18 relative flex aspect-square w-full max-w-25 items-center justify-center border border-theme-border/30 bg-theme-surface text-theme-muted transition-all duration-200 group-hover:-translate-y-1 group-hover:border-theme-accent group-hover:bg-theme-hover group-hover:text-theme-text'
+                        >
+                            <app.Icon size={28} />
                         </div>
 
                         <p className='text-xs font-semibold tracking-wide'>
@@ -109,7 +114,7 @@ export default function HomePage() {
                             times: [0, 0.3, 0.5, 0.9, 1]
                         }}
                         onAnimationComplete={handleAnimationComplete}
-                        className='z-100 flex items-center justify-center border border-[#5b9c3b]/40 bg-[#080e08] text-[#82aa6b]'
+                        className='z-100 flex items-center justify-center border border-theme-border/40 bg-theme-surface text-theme-muted'
                     >
                         <motion.div
                             animate={{
@@ -128,7 +133,7 @@ export default function HomePage() {
                                 times: [0, 0.3, 0.5, 0.9, 1]
                             }}
                         >
-                            {miniAppState.icon}
+                            <miniAppState.Icon size={28} />
                         </motion.div>
                     </motion.div>
                 )}

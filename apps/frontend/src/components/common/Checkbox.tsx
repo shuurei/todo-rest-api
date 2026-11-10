@@ -16,7 +16,7 @@ export default function Checkbox({ label, className,
                 className
             )}
         >
-            <span className="relative flex size-6 shrink-0 items-center justify-center border border-[#5b9c3b]/40 bg-[#101a10] p-1">
+            <span className="relative flex size-6 shrink-0 items-center justify-center border border-theme-border/40 bg-theme-hover p-1">
                 <input
                     type="checkbox"
                     className={cn(
@@ -29,15 +29,15 @@ export default function Checkbox({ label, className,
                 <span
                     className={cn(
                         'flex h-full w-full items-center justify-center',
-                        'peer-checked:border-[#8bc66a] peer-checked:bg-[#8bc66a]',
-                        'peer-focus-visible:ring-2 peer-focus-visible:ring-[#8bc66a]/50',
+                        'peer-checked:border-theme-accent peer-checked:bg-theme-accent',
+                        'peer-focus-visible:ring-2 peer-focus-visible:ring-theme-accent/50',
                         'peer-disabled:opacity-50'
                     )}
                 />
             </span>
 
             {label && (
-                <span className='text-xs text-[#c5e6ad]'>
+                <span className='text-xs text-theme-text'>
                     {label}
                 </span>
             )}

@@ -1,12 +1,12 @@
-import { Entity, Column, CreateDateColumn, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm'
+import { Entity, Column, CreateDateColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm'
 import { User } from './user.entity'
 
 @Entity()
 export class Todo {
-    @PrimaryColumn({ type: 'varchar' })
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @PrimaryColumn({ type: 'varchar' })
+    @Column({ type: 'varchar' })
     userId: string;
 
     @Column({ type: 'bool', default: false })

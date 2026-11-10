@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useLocation, useNavigate } from 'react-router'
+import { Navigate, Outlet, useLocation, useNavigate, useNavigation } from 'react-router'
 import { LuChevronLeft } from 'react-icons/lu'
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
@@ -7,14 +7,14 @@ import { useMiniApp } from '@/contexts/MiniAppContext'
 import { Modal } from '@/components/Modal'
 import ScrambleText from '@/components/ScrambleText'
 
-import { useAuthStore } from '@/stores/useAuthStore'
-import { AuthAPI } from '@/api/AuthAPI' 
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function AuthLayout() {
     const location = useLocation();
     const navigate = useNavigate();
+    const navigation = useNavigation();
 
-    const user = useAuthStore((state) => state.user);
+    const { user } = useAuth();
     const { apps, miniAppState, openMiniApp, closeMiniApp } = useMiniApp();
     
     const [isExpanded, setIsExpanded] = useState(false);
@@ -23,15 +23,13 @@ export default function AuthLayout() {
     const isHome = location.pathname === '/';
 
     useEffect(() => {
-        AuthAPI.check();
-
         if (miniAppState) return;
 
         const app = apps.find((app) => app.path === location.pathname);
         if (!app) return;
 
         openMiniApp(app);
-    }, []);
+    }, [location.pathname, apps, miniAppState, openMiniApp]);
 
     const handleCloseApp = () => {
         navigate('/');
@@ -39,6 +37,8 @@ export default function AuthLayout() {
     }
 
     if (!user) {
+        // Let the pending session loader finish (it may need to show expiration).
+        if (navigation.state !== 'idle') return null;
         return <Navigate to='/auth/login' replace />
     }
 
@@ -62,13 +62,13 @@ export default function AuthLayout() {
                                     <div className='flex items-center gap-3'>
                                         <button
                                             onClick={handleCloseApp}
-                                            className='cursor-pointer flex size-8 items-center justify-center border border-[#5b9c3b]/30 text-[#82aa6b] transition-colors hover:border-[#8bc66a] hover:text-[#c5e6ad]'
+                                            className='cursor-pointer flex size-8 items-center justify-center border border-theme-border/30 text-theme-muted transition-colors hover:border-theme-accent hover:text-theme-text'
                                         >
                                             <LuChevronLeft />
                                         </button>
-                                        <span className='text-[10px] uppercase tracking-[0.2em] text-[#82aa6b]'>
+                                        <span className='text-[10px] uppercase tracking-[0.2em] text-theme-muted'>
                                             <ScrambleText
-                                                text={isHome ? user.username : miniAppState?.name ?? '??'}
+                                                text={isHome ? user.username : apps.find(app => app.path === miniAppState?.path)?.name ?? '??'}
                                                 duration={850}
                                             />
                                         </span>

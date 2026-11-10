@@ -1,26 +1,22 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import Button from '@/components/common/Button'
 import TextInput from '@/components/common/TextInput'
 import { cn } from '@/utils/cn'
-import { useTodoStore } from '@/stores/useTodoStore'
+import { useAuth } from '@/contexts/AuthContext'
 import Checkbox from '@/components/common/Checkbox'
 import ScrambleText from '@/components/ScrambleText'
 import { TodoAPI } from '@/api/TodoAPI'
-import { useAuthStore } from '@/stores/useAuthStore'
 import type { Todo } from '@/types/todo'
 
-export default function TodoPage() {
+function TodoList() {
+    const { t } = useTranslation();
     const [title, setTitle] = useState('')
     const [editingId, setEditingId] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(true);
 
-    const user = useAuthStore((state) => state.user);
-
-    const addTodo = useTodoStore((state) => state.addTodo);
-    const updateTodo = useTodoStore((state) => state.updateTodo);
-    const removeTodo = useTodoStore((state) => state.removeTodo);
-    const todos = useTodoStore((state) => state.todos);
+    const [todos, setTodos] = useState<Todo[]>([]);
     
     const sortedTodos = useMemo(() => {
         return [...todos].sort((a, b) => {
@@ -41,11 +37,10 @@ export default function TodoPage() {
         if (editingId) {
             const { data } = await TodoAPI.update(editingId, { title: value });
 
-            updateTodo(editingId, data);
+            setTodos(current => current.map(todo => todo.id === editingId ? { ...todo, ...data } : todo));
         } else {
-            console.log(value)
             const { data } = await TodoAPI.create({ title: value });
-            addTodo(data);
+            setTodos(current => [...current, data]);
         }
 
         setTitle('');
@@ -53,12 +48,14 @@ export default function TodoPage() {
     }
 
     const handleEdit = (todo: Todo) => {
-        setEditingId(todo.id)
-        setTitle(todo.title)
+        setEditingId(todo.id);
+        setTitle(todo.title);
     }
 
-    const handleDelete = (id: string) => {
-        removeTodo(id);
+    const handleDelete = async (id: string) => {
+        await TodoAPI.delete(id);
+
+        setTodos(current => current.filter(todo => todo.id !== id));
 
         if (editingId === id) {
             setEditingId(null)
@@ -66,51 +63,52 @@ export default function TodoPage() {
         }
     }
 
-    // const handleToggle = async (todo: Todo) => {
-    //     const {  } = await TodoAPI.update(user!.id, todo.id, { isCompleted: !todo.isCompleted  });
-
-    //     toggleTodo(id);
-    // }
+    const handleToggle = async (todo: Todo) => {
+        const { data } = await TodoAPI.update(todo.id, { isCompleted: !todo.isCompleted  });
+        setTodos(current => current.map(item => item.id === todo.id ? { ...item, ...data } : item));
+    }
 
     const handleCancelEdit = () => {
-        setEditingId(null)
-        setTitle('')
+        setEditingId(null);
+        setTitle('');
     }
 
     useEffect(() => {
+        const controller = new AbortController();
         const fetchTodos = async () => {
             try {
-                const { data } = await TodoAPI.getList();
-                useTodoStore.getState().setTodos(data);
+                const { data } = await TodoAPI.getList(controller.signal);
+                if (!controller.signal.aborted) setTodos(data);
             } catch (err) {
-                console.log(err);
+                if (!controller.signal.aborted) console.error(err);
             } finally {
-                setIsLoading(false)
+                if (!controller.signal.aborted) setIsLoading(false);
             }
-        }
+        };
 
-        fetchTodos();
-    }, [])
+        void fetchTodos();
+        return () => controller.abort();
+    }, []);
 
     return (
-        <section className='h-full overflow-y-auto p-6 font-mono text-[#c5e6ad]'>
+        <section className='h-full overflow-y-auto p-6 font-mono text-theme-text'>
             <div className='mx-auto flex w-full max-w-3xl flex-col gap-8'>
                 <header className='flex flex-wrap items-end justify-between gap-4'>
                     <ScrambleText
                         as='h1'
-                        text='Todo List'
+                        text={t('todo.title')}
                         className='mt-3 text-2xl font-bold tracking-tight'      
                     />
                 </header>
 
                 <form
                     onSubmit={handleSubmit}
-                    className='flex flex-col gap-4 border border-[#5b9c3b]/20 bg-[#080e08]/50 p-4'
+                    className='flex flex-col gap-4 border border-theme-border/20 bg-theme-surface/50 p-4'
                 >
                     <TextInput
                         id='todo-title'
-                        label='Title task'
-                        placeholder='Enter a task..'
+                        label={t('todo.titleLabel')}
+                        placeholder={t('todo.titlePlaceholder')}
                         value={title}
                         onChange={(event) => setTitle(event.target.value)}
                         maxLength={200}
@@ -121,54 +119,54 @@ export default function TodoPage() {
                     <div className='flex flex-wrap gap-3'>
                         <Button
                             type='submit'
-                            className='w-auto border border-[#8bc66a] bg-[#8bc66a] text-[#080e08] hover:bg-transparent hover:text-[#a8d887]'
+                            className='w-auto border border-theme-accent bg-theme-accent text-theme-surface hover:bg-transparent hover:text-theme-highlight'
                         >
-                            <ScrambleText text={editingId ? 'Save changes' : 'Create task'} />
+                            <ScrambleText text={t(editingId ? 'common.saveChanges' : 'todo.createTask')} />
                         </Button>
 
                         {editingId && (
                             <Button
                                 type='button'
                                 onClick={handleCancelEdit}
-                                className='w-auto border border-[#5b9c3b]/30 bg-transparent text-[#82aa6b] hover:border-[#8bc66a]'
+                                className='w-auto border border-theme-border/30 bg-transparent text-theme-muted hover:border-theme-accent'
                             >
-                                Cancel
+                                {t('common.cancel')}
                             </Button>
                         )}
                     </div>
                 </form>
 
                 <div className='flex flex-col gap-3'>
-                    <div className='flex items-center justify-between border-b border-[#5b9c3b]/20 pb-3'>
-                        <h2 className='text-xs uppercase tracking-[0.2em] text-[#82aa6b]'>
-                            Tasks
+                    <div className='flex items-center justify-between border-b border-theme-border/20 pb-3'>
+                        <h2 className='text-xs uppercase tracking-[0.2em] text-theme-muted'>
+                            {t('todo.tasks')}
                         </h2>
 
-                        <span className='text-[10px] text-[#49633e]'>
-                            {todos.length} entries
+                        <span className='text-[10px] text-theme-dim'>
+                            {t('todo.entries', { count: todos.length })}
                         </span>
                     </div>
 
                     {isLoading ? (
                         <div>
-                            <p>Loading..</p>
+                            <p>{t('common.loading')}</p>
                         </div>
                     ) : todos.length === 0 ? (
-                        <div className='border border-dashed border-[#5b9c3b]/30 px-6 py-12 text-center'>
-                            <p className='text-xs text-[#49633e]'>
-                                No tasks found
+                        <div className='border border-dashed border-theme-border/30 px-6 py-12 text-center'>
+                            <p className='text-xs text-theme-dim'>
+                                {t('todo.noTasks')}
                             </p>
 
-                            <p className='mt-2 text-[10px] uppercase tracking-widest text-[#49633e]/60'>
-                                Create your first objective
+                            <p className='mt-2 text-[10px] uppercase tracking-widest text-theme-dim/60'>
+                                {t('todo.firstObjective')}
                             </p>
                         </div>
                     ) : (
                         sortedTodos.map((todo) => (
-                            <article key={todo.id} className='group flex items-center gap-4 border border-[#5b9c3b]/20 bg-[#080e08]/40 p-4 transition-colors hover:border-[#5b9c3b]/50'>
+                            <article key={todo.id} className='group flex items-center gap-4 border border-theme-border/20 bg-theme-surface/40 p-4 transition-colors hover:border-theme-border/50'>
                                 <Checkbox
                                     checked={todo.isCompleted}
-                                    onChange={() => handleEdit({ ...todo, isCompleted: todo.isCompleted })}
+                                    onChange={() => handleToggle(todo)}
                                 />
 
                                 <ScrambleText
@@ -177,7 +175,7 @@ export default function TodoPage() {
                                     className={cn(
                                         'min-w-0 flex-1 text-sm',
                                         todo.isCompleted &&
-                                        'text-[#49633e] line-through',
+                                        'text-theme-dim line-through',
                                     )}
                                 />
 
@@ -185,9 +183,9 @@ export default function TodoPage() {
                                     <button
                                         type='button'
                                         onClick={() => handleEdit(todo)}
-                                        className='cursor-pointer text-xs uppercase tracking-wider text-[#82aa6b] transition hover:text-[#c5e6ad]'
+                                        className='cursor-pointer text-xs uppercase tracking-wider text-theme-muted transition hover:text-theme-text'
                                     >
-                                        Edit
+                                        {t('common.edit')}
                                     </button>
 
                                     <button
@@ -195,7 +193,7 @@ export default function TodoPage() {
                                         onClick={() => handleDelete(todo.id)}
                                         className='cursor-pointer text-xs uppercase tracking-wider text-red-400/70 transition hover:text-red-400'
                                     >
-                                        Delete
+                                        {t('common.delete')}
                                     </button>
                                 </div>
                             </article>
@@ -205,4 +203,10 @@ export default function TodoPage() {
             </div>
         </section>
     );
+}
+
+export default function TodoPage() {
+    const { user } = useAuth();
+    // A different account gets fresh local state and its own pending requests.
+    return user ? <TodoList key={user.id} /> : null;
 }

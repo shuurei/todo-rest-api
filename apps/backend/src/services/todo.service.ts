@@ -10,19 +10,13 @@ export class TodoService {
     }
 
     static async create(userId: string, data: CreateTodoInput) {
-        const count = await this.repo.count({ where: { userId } });
-
-        const todo = this.repo.create({
-            ...data,
-            userId,
-            id: (count + 1).toString()
-        });
+        const todo = this.repo.create({ ...data, userId });
 
         return await this.repo.save(todo);
     }
 
-    static async update(userId: string, data: UpdateTodoInput) {
-        const todo = await this.repo.findOneBy({ id: userId });
+    static async update(userId: string, id: string, data: UpdateTodoInput) {
+        const todo = await this.repo.findOneBy({ userId, id });
         if (!todo) {
             throw new HttpNotFoundError('TODO_NOT_FOUND');
         }

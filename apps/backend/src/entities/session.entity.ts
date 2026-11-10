@@ -3,11 +3,14 @@ import { User } from './user.entity'
 
 @Entity()
 export class Session {
-    @PrimaryColumn({ type: 'varchar' })
+    @PrimaryColumn({ type: 'uuid' })
+    id: string;
+
+    @Column({ type: 'varchar' })
     userId: string;
 
-    @PrimaryColumn({ type: 'varchar' })
-    token: string;
+    @Column({ type: 'varchar', length: 97, select: false })
+    tokenHash: string;
 
     @Column({ type: 'text', nullable: true })
     userAgent: string | null;

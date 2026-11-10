@@ -7,8 +7,15 @@ import TodoPage from './pages/TodoPage'
 import SettingsPage from './pages/SettingsPage'
 import HomePage from './pages/HomePage'
 import UserPage from './pages/UserPage'
+import SessionLayout, { sessionLoader } from './layouts/SessionLayout'
+import NotFoundPage from './pages/NotFoundPage'
+import AdminPage from './pages/AdminPage'
 
-const router = createBrowserRouter([
+const router = createBrowserRouter([{
+    element: <SessionLayout />,
+    loader: sessionLoader,
+    shouldRevalidate: () => true,
+    children: [
     {
         path: '/auth',
         element: <GuestLayout />,
@@ -18,7 +25,11 @@ const router = createBrowserRouter([
                 element: <Navigate to='/auth/login' replace />
             },
             {
-                path: ':type',
+                path: 'login',
+                element: <AuthPage />
+            },
+            {
+                path: 'register',
                 element: <AuthPage />
             },
         ]
@@ -42,9 +53,15 @@ const router = createBrowserRouter([
             {
                 path: 'settings',
                 element: <SettingsPage />
+            },
+            {
+                path: 'admin',
+                element: <AdminPage />
             }
         ]
-    }
-]);
+    },
+    { path: '*', element: <NotFoundPage /> }
+    ]
+}]);
 
 export default router;

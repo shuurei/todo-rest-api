@@ -1,7 +1,8 @@
 import type { Request, Response } from 'express'
 import { UserService } from '../services/user.service'
 import { UpdateUserInput } from '../validators/user.schema'
-import { HttpForbiddenError } from '../utils/http-errors'
+import type { UpdateUserPreferencesInput } from '../validators/user-preferences.schema'
+import { clearSessionCookie } from '../utils/session'
 
 export class UserController {
     static async show(req: Request<{ userId: string; }>, res: Response) {
@@ -11,22 +12,24 @@ export class UserController {
     }
 
     static async update(req: Request<{ userId: string; }, {}, UpdateUserInput>, res: Response) {
-        if (req.userId != req.params.userId) {
-            throw new HttpForbiddenError();
-        }
-
         return res.status(200).json({
             data: await UserService.update(req.params.userId, req.body)
         });
     }
 
-    static async remove(req: Request<{ userId: string; }>, res: Response) {
-        if (req.userId != req.params.userId) {
-            throw new HttpForbiddenError();
-        }
+    static async updatePreferences(req: Request<{ userId: string; }, {}, UpdateUserPreferencesInput>, res: Response) {
+        return res.status(200).json({
+            data: await UserService.updatePreferences(req.params.userId, req.body)
+        });
+    }
 
+    static async remove(req: Request<{ userId: string; }>, res: Response) {
         await UserService.delete(req.params.userId);
 
+        if (req.userId === req.params.userId) {
+            clearSessionCookie(res);
+        }
+        
         return res.sendStatus(204);
     }
 }

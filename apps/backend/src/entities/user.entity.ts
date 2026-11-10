@@ -1,4 +1,5 @@
-import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
+import { Entity, Column, CreateDateColumn, DeleteDateColumn, Index, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
+import { defaultUserPreferences, type UserPreferences } from '@todo/shared'
 import { Session } from './session.entity'
 import { Todo } from './todo.entity';
 
@@ -18,6 +19,19 @@ export class User {
 
     @Column({ type: 'integer', default: 0 })
     coins: number;
+
+    @Column({ type: 'integer', default: 0 })
+    flags: number;
+
+    @Column({ type: 'boolean', default: false })
+    isDisabled: boolean;
+
+    @Index('IDX_user_deletedAt')
+    @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+    deletedAt: Date | null;
+
+    @Column({ type: 'jsonb', default: () => `'${JSON.stringify(defaultUserPreferences)}'::jsonb` })
+    preferences: UserPreferences;
 
     @CreateDateColumn({ type: 'timestamptz' })
     updatedAt: Date;

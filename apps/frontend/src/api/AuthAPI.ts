@@ -13,7 +13,6 @@ export interface LoginPayload {
 }
 
 export interface LoginResponseData {
-    token: string;
     user: User;
 }
 
@@ -22,8 +21,8 @@ export class AuthAPI {
         return api;
     }
 
-    static async check() {
-        return await api.get('/users/@me');
+    static async check(signal?: AbortSignal) {
+        return await api.get<ApiResponse<User>>('/users/@me', { signal });
     }
 
     static async register(payload: RegisterPayload) {

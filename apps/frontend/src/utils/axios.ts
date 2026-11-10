@@ -1,25 +1,16 @@
-import { useAuthStore } from '@/stores/useAuthStore'
 import axios from 'axios'
 
 export const api = axios.create({
-    baseURL: 'http://localhost:3000/api',
+    baseURL: import.meta.env?.VITE_API_URL ?? (import.meta.env?.DEV ? 'http://localhost:3000/api' : '/api'),
     withCredentials: true,
     headers: { 'Content-Type': 'application/json' }
 });
 
-api.interceptors.request.use((config) => {
-    const token = useAuthStore.getState().token;
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
-});
-
+// No token is accessible to JavaScript; the browser sends the HttpOnly cookie.
 api.interceptors.response.use((res) => res.data, (err) => {
-    if (err.response?.status === 401) {
-        useAuthStore.getState().logout();
-    }
-
-    return Promise.reject(err.response.data);
+    return Promise.reject({
+        ...(err.response?.data ?? { code: err.code ?? 'NETWORK_ERROR' }),
+        status: err.response?.status,
+        requestUrl: err.config?.url,
+    });
 });

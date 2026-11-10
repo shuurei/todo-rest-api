@@ -1,8 +1,8 @@
 import { Navigate, Outlet } from 'react-router'
-import { useAuthStore } from '@/stores/useAuthStore'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function GuestLayout() {
-    const user = useAuthStore((state) => state.user);
+    const { user } = useAuth();
     if (user) {
         return <Navigate to='/' replace />
     }

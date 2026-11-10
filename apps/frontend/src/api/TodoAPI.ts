@@ -7,8 +7,8 @@ export class TodoAPI {
         return api;
     };
 
-    static async getList() {
-        return await api.get<ApiResponse<Todo[]>>(`/users/@me/todos`);
+    static async getList(signal?: AbortSignal) {
+        return await api.get<ApiResponse<Todo[]>>(`/users/@me/todos`, { signal });
     }
 
     static async create(payload: Partial<Todo>) {
@@ -19,7 +19,7 @@ export class TodoAPI {
         return await api.patch<ApiResponse<Todo>>(`/users/@me/todos/${todoId}`, payload);
     }
 
-    static async delete(todoId: string, payload: Partial<Todo>) {
-        return await api.patch<ApiResponse<Todo>>(`/users/@me/todos/${todoId}`, payload);
+    static async delete(todoId: string) {
+        return await api.delete<ApiResponse<Todo>>(`/users/@me/todos/${todoId}`);
     }
 }

@@ -4,10 +4,11 @@
 	"tasks": {
 		"build": {
 			"dependsOn": [ "^build" ],
-			"outputs": [ "build/**" ],
+			"outputs": [ "build/**", "dist/**" ],
 			"env": [ "NODE_ENV", "HOST", "PORT" ]
 		},
 		"dev": {
+			"dependsOn": [ "^build" ],
 			"cache": false,
 			"persistent": true
 		}

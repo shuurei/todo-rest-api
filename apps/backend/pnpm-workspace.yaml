@@ -1,4 +1,4 @@
 allowBuilds:
   '@scarf/scarf': true
-  bcrypt: true
+  argon2: true
   esbuild: true

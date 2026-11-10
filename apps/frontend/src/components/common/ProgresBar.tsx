@@ -67,12 +67,12 @@ export default function ProgressBar({
     return (
         <div {...props} className={cn('flex w-full flex-col gap-2', className)}>
             <div className='flex items-center justify-between'>
-                <label className='text-sm text-[#c5e6ad]'>
+                <label className='text-sm text-theme-text'>
                     {label}
                 </label>
 
                 {!infinite && (
-                    <span className='text-sm text-[#8bc66a]'>
+                    <span className='text-sm text-theme-accent'>
                         {Math.round(percentage)}%
                     </span>
                 )}
@@ -88,8 +88,8 @@ export default function ProgressBar({
                         <span
                             key={index}
                             className={cn(
-                                'size-6.5 flex-1 bg-[#010201] transition-colors duration-100',
-                                isActive && 'bg-[#8bc66a]',
+                                'size-6.5 flex-1 bg-theme-deep transition-colors duration-100',
+                                isActive && 'bg-theme-accent',
                             )}
                         />
                     )

@@ -1,5 +1,8 @@
 import { AnimatePresence } from 'motion/react'
-import { Link, Navigate, useParams } from 'react-router'
+import { useTranslation } from 'react-i18next'
+import { setGuestLanguage, translateError } from '@/i18n'
+import LanguageSelect from '@/components/common/LanguageSelect'
+import { Link, useLocation } from 'react-router'
 
 import PasswordInput from '@/components/common/PasswordInput'
 import ProgressBar from '@/components/common/ProgresBar'
@@ -8,15 +11,13 @@ import TextInput from '@/components/common/TextInput'
 import ScrambleText from '@/components/ScrambleText'
 import { Modal } from '@/components/Modal'
 import { useEffect, useState } from 'react'
-import { useAuthStore } from '@/stores/useAuthStore'
+import { useAuth } from '@/contexts/AuthContext'
 import { AuthAPI } from '@/api/AuthAPI'
 
 export default function AuthPage() {
-    const { type } = useParams<{ type: 'login' | 'register' }>();
-
-    if (type !== 'login' && type !== 'register') {
-        return <Navigate to="/auth/login" replace />
-    }
+    const { t, i18n } = useTranslation();
+    const { pathname } = useLocation();
+    const type = pathname.endsWith('/register') ? 'register' : 'login';
 
     const [formData, setFormData] = useState({
         username: '',
@@ -27,8 +28,7 @@ export default function AuthPage() {
     const [error, setError] = useState<string | null>(null);
     const isLogin = type === 'login'
 
-    const setUser = useAuthStore((state) => state.setUser);
-    const setToken = useAuthStore((state) => state.setToken);
+    const { setUser } = useAuth();
 
     useEffect(() => {
         setFormData({
@@ -65,9 +65,8 @@ export default function AuthPage() {
             await new Promise((resolve) => setTimeout(resolve, 3000));
 
             setUser(data.user);
-            setToken(data.token);
         } catch (err: any) {
-            setError(err.code ?? err.errors.username);
+            setError(err.code ?? err.errors?.username ?? 'SERVER_ERROR');
 
             if (isLogin) {
                 setFormData((prev) => ({
@@ -89,19 +88,19 @@ export default function AuthPage() {
                 className='h-full w-full sm:max-w-md flex flex-col sm:h-fit'
             >
                 <Modal.Header className='items-center justify-between'>
-                    <span className='text-[10px] uppercase tracking-[0.2em] text-[#82aa6b]'>
+                    <span className='text-[10px] uppercase tracking-[0.2em] text-theme-muted'>
                         <ScrambleText
-                            text={isLogin ? 'Login protocol' : 'Registration protocol'}
+                            text={t(isLogin ? 'auth.loginProtocol' : 'auth.registerProtocol')}
                             duration={850}
                         />
                     </span>
 
-                    <span className='flex items-center gap-2 text-[9px] uppercase tracking-widest text-[#8bc66a]'>
+                    <span className='flex items-center gap-2 text-[9px] uppercase tracking-widest text-theme-accent'>
                         <ScrambleText
-                            text={isLoading ? 'Loading..' : 'System online'}
+                            text={t(isLoading ? 'common.loading' : 'auth.online')}
                             duration={1250}
                         />
-                        <span className='h-1.5 w-1.5 animate-blink bg-[#8bc66a]' />
+                        <span className='h-1.5 w-1.5 animate-blink bg-theme-accent' />
                         <span>//</span>
                     </span>
                 </Modal.Header>
@@ -114,20 +113,20 @@ export default function AuthPage() {
                             <form onSubmit={handleSubmit} className='space-y-5'>
                                 <TextInput
                                     className='uppercase'
-                                    label='Username'
+                                    label={t('common.username')}
                                     id='username'
                                     name='username'
-                                    placeholder='username'
+                                    placeholder={t('auth.usernamePlaceholder')}
                                     autoComplete='username webauthn'
                                     value={formData.username}
                                     onChange={handleChange}
                                     required
-                                    error={error}
+                                    error={error ? translateError(error) : null}
                                     showLabelError={false}
                                 />
 
                                 <PasswordInput
-                                    label='Password'
+                                    label={t('common.password')}
                                     id='password'
                                     name='password'
                                     placeholder='********'
@@ -136,38 +135,38 @@ export default function AuthPage() {
                                     onChange={handleChange}
                                     minLength={import.meta.env.DEV ? 0 : 8}
                                     required
-                                    error={error}
+                                    error={error ? translateError(error) : null}
                                 />
 
                                 <Button
                                     type='submit'
-                                    className='mt-3 h-12 border border-[#a8d887]/50 bg-[#5b9c3b]/15 text-xs uppercase tracking-[0.2em] text-[#c5e6ad] shadow-none hover:border-[#a8d887] hover:bg-[#5b9c3b]/30'
+                                    className='mt-3 h-12 border border-theme-highlight/50 bg-theme-border/15 text-xs uppercase tracking-[0.2em] text-theme-text shadow-none hover:border-theme-highlight hover:bg-theme-border/30'
                                 >
                                     <ScrambleText
-                                        text={isLogin ? 'Initialize session' : 'Create identity'}
+                                        text={t(isLogin ? 'auth.initializeSession' : 'auth.createIdentity')}
                                         duration={5000}
                                     />
                                 </Button>
                             </form>
 
                             <div className='my-6 flex items-center gap-3'>
-                                <div className='h-px flex-1 bg-[#5b9c3b]/30' />
+                                <div className='h-px flex-1 bg-theme-border/30' />
 
-                                <span className='text-[9px] uppercase tracking-[0.2em] text-[#527a43]'>
-                                    Or
+                                <span className='text-[9px] uppercase tracking-[0.2em] text-theme-dim'>
+                                    {t('common.or')}
                                 </span>
 
-                                <div className='h-px flex-1 bg-[#5b9c3b]/30' />
+                                <div className='h-px flex-1 bg-theme-border/30' />
                             </div>
 
-                            <p className='flex flex-col gap-1 text-center text-xs text-[#77966a]'>
+                            <p className='flex flex-col gap-1 text-center text-xs text-theme-muted'>
                                 <ScrambleText
-                                    text={isLogin ? 'No existing identity ? ' : 'Already registered ? '}
+                                    text={t(isLogin ? 'auth.noIdentity' : 'auth.alreadyRegistered')}
                                     duration={400}
                                 />
 
-                                <Link to={isLogin ? '/auth/register' : '/auth/login'} className='font-bold text-[#a8d887] transition hover:text-white'>
-                                    {isLogin ? '[REGISTER]' : '[LOGIN]'}
+                                <Link to={isLogin ? '/auth/register' : '/auth/login'} className='font-bold text-theme-highlight transition hover:text-white'>
+                                    {t(isLogin ? 'auth.registerLink' : 'auth.loginLink')}
                                 </Link>
                             </p>
                         </>)}
@@ -175,8 +174,9 @@ export default function AuthPage() {
                 </Modal.Content>
 
                 {!isLoading && (
-                    <Modal.Footer>
-                        <ScrambleText text='// System v.26' duration={1500} />
+                    <Modal.Footer className='flex-col gap-4'>
+                        <LanguageSelect value={i18n.resolvedLanguage === 'en' ? 'en' : 'fr'} onChange={setGuestLanguage} />
+                        <ScrambleText text={t('auth.systemVersion')} duration={1500} />
                     </Modal.Footer>
                 )}
             </Modal>
