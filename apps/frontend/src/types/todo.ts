@@ -1,7 +1,1 @@
-export interface Todo {
-    id: string;
-    isCompleted: boolean;
-    title: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
+export type { GatewayTodo as Todo } from '@todo/shared';

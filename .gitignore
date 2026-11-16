@@ -145,5 +145,8 @@ vite.config.ts.timestamp-*
 # Astro generated types
 .astro/
 
+# Uploaded wallpapers
+apps/backend/uploads/
+
 # Turbo Repo
 .turbo

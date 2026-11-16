@@ -1,13 +1,13 @@
-import { useAuth } from '@/contexts/AuthContext'
-import { createContext, useContext, useMemo, useState } from 'react'
-import type { IconType } from 'react-icons'
-import { useTranslation } from 'react-i18next'
-import { hasFlag, UserFlags } from '@todo/shared'
-import { LuCheck, LuShieldCheck, LuSlidersHorizontal, LuUser } from 'react-icons/lu'
+import { useAuth } from '@/contexts/AuthContext';
+import { createContext, useContext, useMemo, useState } from 'react';
+import type { IconType } from 'react-icons';
+import { useTranslation } from 'react-i18next';
+import { hasFlag, UserFlags, defaultUserPreferences, type HomeAppPath } from '@todo/shared';
+import { LuCheck, LuShieldCheck, LuSlidersHorizontal } from 'react-icons/lu';
 
 export interface MiniApp {
     name: string;
-    path: string;
+    path: HomeAppPath;
     Icon: IconType;
 }
 
@@ -24,7 +24,11 @@ export interface MiniAppState extends MiniApp {
 export interface MiniAppContextType {
     apps: MiniApp[];
     miniAppState: MiniAppState | null;
-    openMiniApp: (app: Omit<MiniAppState, 'isOpen' | 'origin'> & { origin?: MiniAppOrigin }) => void;
+    openMiniApp: (
+        app: Omit<MiniAppState, 'isOpen' | 'origin'> & {
+            origin?: MiniAppOrigin;
+        }
+    ) => void;
     updateMiniAppOrigin: (origin: MiniAppOrigin) => void;
     closeMiniApp: () => void;
     clearMiniApp: () => void;
@@ -36,23 +40,19 @@ export const MiniAppProvider = ({ children }: { children: React.ReactNode }) => 
     const { t } = useTranslation();
     const [miniAppState, setMiniAppState] = useState<MiniAppState | null>(null);
     const { user } = useAuth();
-
     const apps = useMemo<MiniApp[]>(() => {
-        const apps = [{
-            name: t('apps.todos'),
-            path: '/todos',
-            Icon: LuCheck
-        },
-        {
-            name: user?.username ?? t('apps.account'),
-            path: '/account',
-            Icon: LuUser
-        },
-        {
-            name: t('apps.settings'),
-            path: '/settings',
-            Icon: LuSlidersHorizontal
-        }]
+        const apps: MiniApp[] = [
+            {
+                name: t('apps.todos'),
+                path: '/todos',
+                Icon: LuCheck
+            },
+            {
+                name: t('apps.settings'),
+                path: '/settings',
+                Icon: LuSlidersHorizontal
+            }
+        ];
 
         if (user && hasFlag(user.flags, UserFlags.ADMIN)) {
             apps.unshift({
@@ -62,31 +62,64 @@ export const MiniAppProvider = ({ children }: { children: React.ReactNode }) => 
             });
         }
 
-        return apps;
-    }, [user?.username, user?.flags, t]);
+        const order = user?.preferences.appOrder ?? defaultUserPreferences.appOrder;
+        const rank = (path: HomeAppPath) => {
+            const index = order.indexOf(path);
 
-    const value = useMemo(() => ({
-        apps,
-        miniAppState,
-        openMiniApp: (app: Omit<MiniAppState, 'isOpen' | 'origin'> & { origin?: MiniAppOrigin }) => {
-            if (miniAppState) return;
+            return index < 0 ? order.length : index;
+        };
 
-            app.origin ??= { x: 0, y: 0 }
+        return apps.sort((a, b) => rank(a.path) - rank(b.path));
+    }, [user?.flags, user?.preferences.appOrder, t]);
+    const value = useMemo(
+        () => ({
+            apps,
+            miniAppState,
+            openMiniApp: (
+                app: Omit<MiniAppState, 'isOpen' | 'origin'> & {
+                    origin?: MiniAppOrigin;
+                }
+            ) => {
+                if (miniAppState) {
+                    return;
+                }
 
-            setMiniAppState({ ...app, isOpen: true } as MiniAppState)
-        },
-        updateMiniAppOrigin: ({ x, y }: MiniAppOrigin) => {
-            setMiniAppState((app) => app && ({ ...app, origin: { x, y } }));
-        },
-        closeMiniApp: () => setMiniAppState((prev) => prev && ({ ...prev, isOpen: false })),
-        clearMiniApp: () => setMiniAppState(null)
-    }), [apps, miniAppState]);
+                app.origin ??= {
+                    x: 0,
+                    y: 0
+                };
 
-    return (
-        <MiniAppContext.Provider value={value}>
-            {children}
-        </MiniAppContext.Provider>
+                setMiniAppState({
+                    ...app,
+                    isOpen: true
+                } as MiniAppState);
+            },
+            updateMiniAppOrigin: ({ x, y }: MiniAppOrigin) => {
+                setMiniAppState(
+                    (app) =>
+                        app && {
+                            ...app,
+                            origin: {
+                                x,
+                                y
+                            }
+                        }
+                );
+            },
+            closeMiniApp: () =>
+                setMiniAppState(
+                    (prev) =>
+                        prev && {
+                            ...prev,
+                            isOpen: false
+                        }
+                ),
+            clearMiniApp: () => setMiniAppState(null)
+        }),
+        [apps, miniAppState]
     );
+
+    return <MiniAppContext.Provider value={value}>{children}</MiniAppContext.Provider>;
 };
 
 export const useMiniApp = () => {

@@ -1,5 +1,5 @@
-import type { ButtonHTMLAttributes } from 'react'
-import { cn } from '@/utils/cn'
+import type { ButtonHTMLAttributes } from 'react';
+import { cn } from '@/utils/cn';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     loading?: boolean;
@@ -18,9 +18,7 @@ export default function Button({ children, loading = false, disabled, className,
             )}
             {...props}
         >
-            {loading && (
-                <span className="h-4 w-4 animate-spin border-2 border-current border-r-transparent" />
-            )}
+            {loading && <span className="h-4 w-4 animate-spin border-2 border-current border-r-transparent" />}
 
             {children}
         </button>

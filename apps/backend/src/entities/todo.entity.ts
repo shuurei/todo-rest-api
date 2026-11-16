@@ -1,27 +1,36 @@
-import { Entity, Column, CreateDateColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm'
-import { User } from './user.entity'
+import { Entity, Column, CreateDateColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from './user.entity';
 
 @Entity()
 export class Todo {
     @PrimaryGeneratedColumn('uuid')
     id: string;
-
-    @Column({ type: 'varchar' })
+    @Column({
+        type: 'varchar'
+    })
     userId: string;
-
-    @Column({ type: 'bool', default: false })
+    @Column({
+        type: 'bool',
+        default: false
+    })
     isCompleted: boolean;
-
-    @Column({ type: 'varchar' })
+    @Column({
+        type: 'varchar'
+    })
     title: string;
-
-    @CreateDateColumn({ type: 'timestamptz' })
+    @CreateDateColumn({
+        type: 'timestamptz'
+    })
     updatedAt: Date;
-
-    @CreateDateColumn({ type: 'timestamptz' })
+    @CreateDateColumn({
+        type: 'timestamptz'
+    })
     createdAt: Date;
-
-    @ManyToOne(() => User, (user) => user.todos, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'userId' })
+    @ManyToOne(() => User, (user) => user.todos, {
+        onDelete: 'CASCADE'
+    })
+    @JoinColumn({
+        name: 'userId'
+    })
     user: User;
 }

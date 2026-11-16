@@ -1,16 +1,16 @@
-import { AnimatePresence, motion, type HTMLMotionProps } from 'motion/react'
-import { cn } from '@/utils/cn'
+import { AnimatePresence, motion, type HTMLMotionProps } from 'motion/react';
+import { cn } from '@/utils/cn';
 
 Modal.Header = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
     return (
-        <div {...props} className={cn(
-            'sticky top-0 z-20 flex border-b border-theme-border/30 bg-theme-panel px-5 py-3',
-            className
-        )}>
+        <div
+            {...props}
+            className={cn('sticky top-0 z-20 flex border-b border-theme-border/30 bg-theme-panel px-5 py-3', className)}
+        >
             {children}
         </div>
     );
-}
+};
 
 Modal.Content = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
     return (
@@ -18,26 +18,33 @@ Modal.Content = ({ children, className, ...props }: React.HTMLAttributes<HTMLDiv
             {children}
         </div>
     );
-}
+};
 
 Modal.Footer = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
     return (
-        <div {...props} className={cn(
-            'flex border-t text-theme-dim border-theme-border/30 text-[10px] px-5 py-3 tracking-widest',
-            className
-        )}>
+        <div
+            {...props}
+            className={cn(
+                'flex border-t text-theme-dim border-theme-border/30 text-[10px] px-5 py-3 tracking-widest',
+                className
+            )}
+        >
             {children}
         </div>
     );
-}
+};
 
 export function Modal({ children, className, ...props }: HTMLMotionProps<'div'>) {
     return (
-        <AnimatePresence mode='wait'>
+        <AnimatePresence mode="wait">
             <motion.div
                 {...props}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 1, 0, 1, 0, 1] }}
+                initial={{
+                    opacity: 0
+                }}
+                animate={{
+                    opacity: [0, 1, 1, 0, 1, 0, 1]
+                }}
                 transition={{
                     duration: 0.27,
                     times: [0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]

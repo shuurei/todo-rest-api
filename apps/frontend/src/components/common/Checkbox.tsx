@@ -1,13 +1,11 @@
-
-import type { InputHTMLAttributes } from 'react'
-import { cn } from '@/utils/cn'
+import type { InputHTMLAttributes } from 'react';
+import { cn } from '@/utils/cn';
 
 interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
     label?: string;
 }
 
-export default function Checkbox({ label, className,
-    ...props }: CheckboxProps) {
+export default function Checkbox({ label, className, ...props }: CheckboxProps) {
     return (
         <label
             className={cn(
@@ -36,11 +34,7 @@ export default function Checkbox({ label, className,
                 />
             </span>
 
-            {label && (
-                <span className='text-xs text-theme-text'>
-                    {label}
-                </span>
-            )}
+            {label && <span className="text-xs text-theme-text">{label}</span>}
         </label>
     );
 }

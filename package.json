@@ -4,7 +4,12 @@
 	"private": true,
 	"scripts": {
 		"dev": "turbo run dev",
-		"build": "turbo run build"
+		"build": "turbo run build",
+		"db:up": "pnpm --filter backend db:up",
+		"db:down": "pnpm --filter backend db:down",
+		"db:restart": "pnpm --filter backend db:restart",
+		"db:logs": "pnpm --filter backend db:logs",
+		"db:remove": "pnpm --filter backend db:remove"
 	},
 	"devDependencies": {
 		"turbo": "^2.11.10"
