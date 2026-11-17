@@ -1,15 +1,7 @@
-import {
-    createContext,
-    useCallback,
-    useContext,
-    useLayoutEffect,
-    useMemo,
-    useRef,
-    useState,
-    type ReactNode
-} from 'react';
-import { normalizeUserPreferences } from '@todo/shared';
-import type { User } from '@/types/user';
+import { createContext, useCallback, useContext, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { normalizeUserPreferences } from '@todo/shared'
+import type { User } from '@/types/user'
+import { useGateway } from '@/hooks/useGateway'
 
 interface AuthContextValue {
     user: User | null;
@@ -17,29 +9,25 @@ interface AuthContextValue {
     getUser: () => User | null;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
 const normalizeUser = (user: User | null) => {
-    return user
-        ? {
-              ...user,
-              preferences: normalizeUserPreferences(user.preferences)
-          }
-        : null;
+    if (!user) return null
+
+    return {
+        ...user,
+        preferences: normalizeUserPreferences(user.preferences)
+    };
 };
 
-export function AuthProvider({
-    session: snapshot,
-    children
-}: {
-    session: {
-        user: User | null;
-    };
-    children: ReactNode;
-}) {
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+export function AuthProvider({ children }: { children: ReactNode; }) {
+    const snapshot = useGateway();
+
     const [session, setSession] = useState(() => ({
         source: snapshot,
         user: normalizeUser(snapshot.user)
     }));
+
     const userRef = useRef(session.user);
 
     if (session.source !== snapshot) {
@@ -63,18 +51,21 @@ export function AuthProvider({
             user: normalized
         }));
     }, []);
+
     const logout = useCallback(() => setUser(null), [setUser]);
     const getUser = useCallback(() => userRef.current, []);
-    const value = useMemo(
-        () => ({
-            user: session.user,
-            logout,
-            getUser
-        }),
-        [session.user, logout, getUser]
-    );
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    const value = useMemo(() => ({
+        user: session.user,
+        logout,
+        getUser
+    }), [session.user, logout, getUser]);
+
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
+    );
 }
 
 export function useAuth() {

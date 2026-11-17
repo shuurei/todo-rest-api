@@ -10,9 +10,9 @@ export const homeAppPaths = ['/admin', '/todos', '/settings'] as const;
 
 export type HomeAppPath = (typeof homeAppPaths)[number];
 
-export const maxWallpaperBlur = 40;
+export const maxWallpaperBlur = 30;
 
-export const transitionSpeeds = [0.5, 1, 2] as const;
+export const transitionSpeeds = [0.8, 1.2, 2.2] as const;
 
 export type TransitionSpeed = (typeof transitionSpeeds)[number];
 

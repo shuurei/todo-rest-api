@@ -1,13 +1,13 @@
-import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router';
-import { AnimatePresence, motion } from 'motion/react';
-import { useWindowSize } from '@/hooks/useWindowSize';
-import { useMiniApp, type MiniApp } from '@/contexts/MiniAppContext';
-import HomeApps from '@/components/HomeApps';
-import HomeWallpaper from '@/components/HomeWallpaper';
-import HomeWidgets from '@/components/HomeWidgets';
-import { useAuth } from '@/contexts/AuthContext';
-import { defaultUserPreferences } from '@todo/shared';
+import { useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router'
+import { AnimatePresence, motion } from 'motion/react'
+import { useWindowSize } from '@/hooks/useWindowSize'
+import { useMiniApp, type MiniApp } from '@/contexts/MiniAppContext'
+import HomeApps from '@/components/HomeApps'
+import HomeWallpaper from '@/components/HomeWallpaper'
+import HomeWidgets from '@/components/HomeWidgets'
+import { useAuth } from '@/contexts/AuthContext'
+import { defaultUserPreferences } from '@todo/shared'
 
 export default function HomePage() {
     const navigate = useNavigate();
@@ -20,10 +20,7 @@ export default function HomePage() {
     useEffect(() => {
         if (miniAppState) {
             const rect = appRefs.current[miniAppState.path]?.getBoundingClientRect();
-
-            if (!rect) {
-                return;
-            }
+            if (!rect) return;
 
             updateMiniAppOrigin(rect);
         }
@@ -50,8 +47,9 @@ export default function HomePage() {
     };
 
     return (
-        <section className="relative isolate flex h-full flex-col gap-8 overflow-y-auto p-6 font-mono text-theme-text">
+        <section className='relative isolate flex h-full flex-col gap-8 overflow-y-auto p-6 font-mono text-theme-text'>
             <HomeWallpaper wallpaper={settings.homeWallpaper} blur={settings.homeWallpaperBlur} />
+
             <HomeWidgets
                 showClock={settings.homeShowClock}
                 showWeather={settings.homeShowWeather}

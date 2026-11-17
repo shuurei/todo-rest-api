@@ -208,7 +208,7 @@ function PreferencesForm({ user, category }: { user: User; category: PreferenceC
                                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                                         {transitionSpeeds.map((duration, index) => {
                                             const speed = (['fast', 'normal', 'slow'] as const)[index];
-
+                                            console.log(duration)
                                             return (
                                                 <label
                                                     key={duration}

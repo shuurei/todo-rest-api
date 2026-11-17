@@ -81,6 +81,60 @@
     --color-theme-highlight: var(--palette-highlight);
 }
 
+.wallpaper-blur-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--palette-border);
+}
+
+.wallpaper-blur-slider::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--palette-border);
+}
+
+.wallpaper-blur-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    margin-top: -7px;
+    border: 2px solid var(--palette-surface);
+    border-radius: 50%;
+    background: var(--palette-accent);
+    transition: box-shadow 150ms ease, transform 150ms ease;
+}
+
+.wallpaper-blur-slider::-moz-range-thumb {
+    box-sizing: border-box;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--palette-surface);
+    border-radius: 50%;
+    background: var(--palette-accent);
+    transition: box-shadow 150ms ease, transform 150ms ease;
+}
+
+.wallpaper-blur-slider:is(:hover, :focus-visible)::-webkit-slider-thumb {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--palette-accent) 18%, transparent);
+}
+
+.wallpaper-blur-slider:is(:hover, :focus-visible)::-moz-range-thumb {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--palette-accent) 18%, transparent);
+}
+
+.wallpaper-blur-slider:active::-webkit-slider-thumb {
+    transform: scale(1.15);
+}
+
+.wallpaper-blur-slider:active::-moz-range-thumb {
+    transform: scale(1.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wallpaper-blur-slider::-webkit-slider-thumb { transition: none; }
+    .wallpaper-blur-slider::-moz-range-thumb { transition: none; }
+}
+
 @layer base {
     body {
         @apply font-mono bg-theme-page min-h-svh font-roboto w-full flex justify-center;

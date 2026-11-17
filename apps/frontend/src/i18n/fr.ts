@@ -98,6 +98,7 @@ export default {
         categoryDescription: "Fond d'écran, widgets et ordre des applications",
         wallpaper: 'Fond d’écran',
         uploadImage: 'Importer une image',
+        removeWallpaper: 'Supprimer',
         uploadHelp:
             'JPEG, PNG, WebP ou GIF, 10 Mo maximum. Stockage en JPEG haute qualité (GIF non animé). Sélectionnez une photo puis enregistrez : elle sera importée avec vos préférences. Les images sont accessibles à toute personne disposant du lien.',
         blur: 'Flou du fond',

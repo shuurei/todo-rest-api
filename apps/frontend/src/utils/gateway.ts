@@ -1,17 +1,7 @@
-import {
-    GatewayOpcode as Op,
-    GatewayCloseCode as Close,
-    fatalGatewayCloseCodes,
-    gatewayVersion,
-    type GatewayDispatch,
-    type GatewayTodo,
-    type GatewaySession,
-    type GatewayUserProfile,
-    type SessionIssue
-} from '@todo/shared';
-import type { User } from '@/types/user';
-import { api } from '@/utils/axios';
-import { GatewaySocket } from './gateway-socket';
+import { GatewayOpcode as Op, GatewayCloseCode as Close, fatalGatewayCloseCodes, gatewayVersion, type GatewayDispatch, type GatewayTodo, type GatewaySession, type GatewayUserProfile, type SessionIssue } from '@todo/shared'
+import type { User } from '@/types/user'
+import { api } from '@/utils/axios'
+import { GatewaySocket } from './gateway-socket'
 
 export interface GatewayState {
     status: 'connecting' | 'offline' | 'ready' | 'fatal';
@@ -29,8 +19,6 @@ export interface GatewayState {
 type Topic = 'todos';
 
 export class Gateway {
-    private constructor() {}
-
     private static state: GatewayState = {
         status: 'connecting',
         initialized: false,
@@ -43,11 +31,12 @@ export class Gateway {
         latency: null,
         closeCode: null
     };
+
     private static readonly listeners = new Set<() => void>();
     private static readonly topics = new Map<Topic, Set<symbol>>();
+
     private static socket: GatewaySocket | null = null;
     private static retryTimer: ReturnType<typeof setTimeout> | undefined;
-    private static startTimer: ReturnType<typeof setTimeout> | undefined;
     private static started = false;
     private static anonymous = false;
 
@@ -71,19 +60,15 @@ export class Gateway {
         this.started = true;
 
         window.addEventListener('online', this.onOnline);
-
         window.addEventListener('offline', this.onOffline);
 
-        this.startTimer = setTimeout(() => this.connect(), 0);
+        queueMicrotask(() => this.connect());
     }
 
     static reconnect() {
         this.anonymous = false;
 
-        this.update({
-            status: 'connecting',
-            issue: null
-        });
+        this.update({ status: 'connecting', issue: null });
 
         this.connect();
     }
@@ -113,9 +98,7 @@ export class Gateway {
 
                 this.topics.delete(topic);
 
-                this.update({
-                    todos: []
-                });
+                this.update({ todos: [] });
 
                 if (this.state.status === 'ready') {
                     this.socket?.send(Op.Unsubscribe, topic);
@@ -125,9 +108,7 @@ export class Gateway {
     }
 
     static dismissIssue() {
-        this.update({
-            issue: null
-        });
+        this.update({ issue: null });
     }
 
     private static update(patch: Partial<GatewayState>) {
@@ -142,12 +123,9 @@ export class Gateway {
     static stop() {
         this.started = false;
 
-        clearTimeout(this.startTimer);
-
         clearTimeout(this.retryTimer);
 
         window.removeEventListener('online', this.onOnline);
-
         window.removeEventListener('offline', this.onOffline);
 
         this.detach();
@@ -155,7 +133,6 @@ export class Gateway {
 
     private static detach() {
         this.socket?.dispose();
-
         this.socket = null;
     }
 
@@ -168,9 +145,7 @@ export class Gateway {
         }
 
         url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
-
         url.searchParams.set('v', String(gatewayVersion));
-
         url.searchParams.set('encoding', 'json');
 
         return url.href;
@@ -184,25 +159,15 @@ export class Gateway {
         clearTimeout(this.retryTimer);
 
         this.detach();
-
-        this.update({
-            status: 'connecting',
-            retryAt: null
-        });
+        this.update({ status: 'connecting', retryAt: null });
 
         try {
             this.socket = new GatewaySocket(this.socketUrl(), {
-                hello: () =>
-                    this.socket?.send(Op.Identify, {
-                        anonymous: this.anonymous
-                    }),
+                hello: () => this.socket?.send(Op.Identify, { anonymous: this.anonymous }),
                 dispatch: (packet) => this.dispatch(packet),
                 close: (code, reason) => this.onClose(code, reason),
                 reconnect: () => this.schedule(0),
-                latency: (latency) =>
-                    this.update({
-                        latency
-                    })
+                latency: (latency) => this.update({ latency })
             });
         } catch {
             this.schedule();
@@ -218,10 +183,7 @@ export class Gateway {
             return;
         }
 
-        this.update({
-            status: 'offline',
-            retryAt: Date.now() + delay
-        });
+        this.update({ status: 'offline', retryAt: Date.now() + delay });
 
         this.retryTimer = setTimeout(() => this.connect(), delay);
     }
@@ -249,9 +211,7 @@ export class Gateway {
     }
 
     private static onClose(code: number, reason: string) {
-        this.update({
-            closeCode: code
-        });
+        this.update({ closeCode: code });
 
         if (code === Close.AuthenticationFailed) {
             if (this.anonymous) {
@@ -261,7 +221,6 @@ export class Gateway {
             this.anonymous = true;
 
             this.revoke(reason);
-
             this.schedule(0);
         } else if (fatalGatewayCloseCodes.includes(code)) {
             this.fatal(code);
@@ -301,6 +260,7 @@ export class Gateway {
 
                 break;
             }
+
             case 'CURRENT_USER_UPDATE': {
                 if (String(this.state.user?.id) === String(packet.d.id)) {
                     this.update({
@@ -310,6 +270,7 @@ export class Gateway {
 
                 break;
             }
+
             case 'USER_UPDATE': {
                 return this.update({
                     users: {
@@ -318,6 +279,7 @@ export class Gateway {
                     }
                 });
             }
+
             case 'TODO_LIST_UPDATE': {
                 if (this.topics.get('todos')?.size) {
                     this.update({
@@ -327,11 +289,13 @@ export class Gateway {
 
                 break;
             }
+
             case 'SESSIONS_UPDATE': {
                 return this.update({
                     sessions: packet.d
                 });
             }
+            
             case 'SESSION_REVOKED': {
                 return this.revoke(packet.d.code);
             }

@@ -1,20 +1,22 @@
-import { Navigate, Outlet, useLocation, useNavigate, useNavigation } from 'react-router';
-import { LuChevronLeft } from 'react-icons/lu';
-import { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
-import { useMiniApp } from '@/contexts/MiniAppContext';
-import { Modal } from '@/components/Modal';
-import ScrambleText from '@/components/ScrambleText';
-import { useAuth } from '@/contexts/AuthContext';
+import { Navigate, Outlet, useLocation, useNavigate, useNavigation } from 'react-router'
+import { LuChevronLeft } from 'react-icons/lu'
+import { useEffect, useState } from 'react'
+import { motion } from 'motion/react'
+import { useMiniApp } from '@/contexts/MiniAppContext'
+import { Modal } from '@/components/Modal'
+import ScrambleText from '@/components/ScrambleText'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function AuthLayout() {
     const location = useLocation();
     const navigate = useNavigate();
     const navigation = useNavigation();
-    const { user } = useAuth();
     const { apps, miniAppState, openMiniApp, closeMiniApp } = useMiniApp();
+    const { user } = useAuth();
+    
     const [isExpanded, setIsExpanded] = useState(false);
     const [showContent, setShowContent] = useState(false);
+
     const isHome = location.pathname === '/';
 
     useEffect(() => {
@@ -23,17 +25,13 @@ export default function AuthLayout() {
         }
 
         const app = apps.find((app) => app.path === location.pathname || location.pathname.startsWith(`${app.path}/`));
-
-        if (!app) {
-            return;
-        }
+        if (!app) return;
 
         openMiniApp(app);
     }, [location.pathname, navigation.state, apps, miniAppState, openMiniApp]);
 
     const handleCloseApp = () => {
         navigate('/');
-
         closeMiniApp();
     };
 

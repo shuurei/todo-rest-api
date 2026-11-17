@@ -96,6 +96,7 @@ export default {
         categoryDescription: 'Wallpaper, widgets and application order',
         wallpaper: 'Wallpaper',
         uploadImage: 'Upload an image',
+        removeWallpaper: 'Remove',
         uploadHelp:
             'JPEG, PNG, WebP or GIF, up to 10 MB. Stored as a high-quality JPEG (GIFs become static). Select a photo and save to upload it along with your preferences. Anyone with the link can access the image.',
         blur: 'Wallpaper blur',

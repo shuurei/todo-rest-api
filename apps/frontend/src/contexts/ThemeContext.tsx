@@ -1,8 +1,8 @@
-import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
-import { defaultUserPreferences, type UserPreferences } from '@todo/shared';
-import { useAuth } from '@/contexts/AuthContext';
-import { extractImagePalette, type ImagePalette } from '@/utils/image-palette';
-import { getWallpaperUrl } from '@/utils/wallpaper';
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from 'react'
+import { defaultUserPreferences, type UserPreferences } from '@todo/shared'
+import { useAuth } from '@/contexts/AuthContext'
+import { extractImagePalette, type ImagePalette } from '@/utils/image-palette'
+import { getWallpaperUrl } from '@/utils/wallpaper'
 
 type ThemePreview = Partial<Pick<UserPreferences, 'themeColor' | 'themeFromWallpaper' | 'homeWallpaper'>> & {
     wallpaperPreviewUrl?: string | null;
@@ -19,40 +19,38 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
     const { user } = useAuth();
+
     const [preview, setPreview] = useState<ThemePreview | null>(null);
+
     const preferences = {
         ...(user?.preferences ?? defaultUserPreferences),
         ...preview
     };
+
     const source = preferences.themeFromWallpaper
         ? (preview?.wallpaperPreviewUrl ?? getWallpaperUrl(preferences.homeWallpaper))
         : null;
+
     const [result, setResult] = useState<{
         source: string;
         palette: ImagePalette | null;
     } | null>(null);
 
     useEffect(() => {
-        if (!source) {
-            return;
-        }
+        if (!source) return;
 
         let active = true;
 
         const timer = window.setTimeout(() => {
-            void extractImagePalette(source).then((palette) => {
+            extractImagePalette(source).then((palette) => {
                 if (active) {
-                    setResult({
-                        source,
-                        palette
-                    });
+                    setResult({ source, palette });
                 }
             });
         }, 350);
 
         return () => {
             active = false;
-
             window.clearTimeout(timer);
         };
     }, [source]);
@@ -61,10 +59,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const dynamicStatus: DynamicStatus = !source
         ? 'idle'
         : result?.source !== source
-          ? 'loading'
-          : palette
-            ? 'ready'
-            : 'unavailable';
+            ? 'loading'
+            : palette
+                ? 'ready'
+                : 'unavailable';
 
     useLayoutEffect(() => {
         const root = document.documentElement;
@@ -73,24 +71,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
         if (palette) {
             root.style.setProperty('--dynamic-hue', String(palette.hue));
-
             root.style.setProperty('--dynamic-saturation', String(palette.saturation));
         } else {
             root.style.removeProperty('--dynamic-hue');
-
             root.style.removeProperty('--dynamic-saturation');
         }
     }, [preferences.themeColor, palette]);
 
-    const value = useMemo(
-        () => ({
-            setPreview,
-            dynamicStatus
-        }),
-        [dynamicStatus]
-    );
+    const value = useMemo(() => ({
+        setPreview,
+        dynamicStatus
+    }), [dynamicStatus]);
 
-    return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+    return (
+        <ThemeContext.Provider value={value}>
+            {children}
+        </ThemeContext.Provider>
+    );
 }
 
 export function useTheme() {
@@ -109,7 +106,6 @@ export function useThemePreview(preview: ThemePreview | null) {
     const color = preview?.themeColor;
     const dynamic = preview?.themeFromWallpaper;
     const wallpaper = preview?.homeWallpaper;
-    const wallpaperPreviewUrl = preview?.wallpaperPreviewUrl;
 
     useLayoutEffect(() => {
         if (!enabled) {
@@ -130,12 +126,8 @@ export function useThemePreview(preview: ThemePreview | null) {
             override.homeWallpaper = wallpaper;
         }
 
-        if (wallpaperPreviewUrl !== undefined) {
-            override.wallpaperPreviewUrl = wallpaperPreviewUrl;
-        }
-
         setPreview(override);
 
         return () => setPreview(null);
-    }, [enabled, color, dynamic, wallpaper, wallpaperPreviewUrl, setPreview]);
+    }, [enabled, color, dynamic, wallpaper, setPreview]);
 }

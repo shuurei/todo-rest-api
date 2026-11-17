@@ -3,13 +3,10 @@ export interface WeatherData {
     code: number;
 }
 
-const cache = new Map<
-    string,
-    {
-        data: WeatherData;
-        expiresAt: number;
-    }
->();
+const cache = new Map<string, {
+    data: WeatherData;
+    expiresAt: number;
+}>();
 
 export const weatherRefreshInterval = 10 * 60 * 1000;
 
@@ -18,6 +15,7 @@ const record = (value: unknown) => {
         ? (value as Record<string, unknown>)
         : {};
 };
+
 const fetchJson = async (url: URL, signal: AbortSignal) => {
     const response = await fetch(url, {
         signal: AbortSignal.any([signal, AbortSignal.timeout(10000)]),
@@ -132,37 +130,41 @@ export const getWeather = async (latitude: number, longitude: number, signal: Ab
 };
 
 export const weatherCondition = (code: number) => {
-    if (code === 0) {
-        return 'clear';
-    }
+    switch (code) {
+        case 0: {
+            return 'clear';
+        }
 
-    if (code === 1 || code === 2) {
-        return 'partlyCloudy';
-    }
+        case 1: case 2: {
+            return 'partlyCloudy';
+        }
 
-    if (code === 3) {
-        return 'cloudy';
-    }
+        case 3: {
+            return 'cloudy';
+        }
 
-    if (code === 45 || code === 48) {
-        return 'fog';
-    }
+        case 45: case 48: {
+            return 'fog';
+        }
 
-    if ([51, 53, 55, 56, 57].includes(code)) {
-        return 'drizzle';
-    }
+        case 51: case 53: case 55: case 56: case 57: {
+            return 'drizzle';
+        }
 
-    if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) {
-        return 'rain';
-    }
+        case 61: case 63: case 65: case 66: case 67: case 80: case 81: case 82: {
+            return 'rain';
+        }
 
-    if ([71, 73, 75, 77, 85, 86].includes(code)) {
-        return 'snow';
-    }
+        case 71: case 73: case 75: case 77: case 85: case 86: {
+            return 'snow';
+        }
 
-    if ([95, 96, 99].includes(code)) {
-        return 'storm';
-    }
+        case 95: case 96: case 99: {
+            return 'storm';
+        }
 
-    return 'unknown';
+        default: {
+            return 'unknown';
+        }
+    }
 };

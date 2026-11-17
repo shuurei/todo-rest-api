@@ -1,4 +1,4 @@
-export function getApiErrorCode(error: unknown): string {
+export const getApiErrorCode = (error: unknown) => {
     const failure = error as {
         code?: string;
         errors?: Record<string, string>;

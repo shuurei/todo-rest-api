@@ -4,36 +4,29 @@ import type { WeatherLocation } from '@todo/shared';
 import WeatherWidget from '@/components/WeatherWidget';
 import { cn } from '@/utils/cn';
 
-export default function HomeWidgets({
-    showClock,
-    showWeather,
-    weatherLocation,
-    hasWallpaper
-}: {
+interface HomeWidgetsProps {
     showClock: boolean;
     showWeather: boolean;
     weatherLocation: WeatherLocation | null;
     hasWallpaper: boolean;
-}) {
-    const { t, i18n } = useTranslation();
+}
+
+export default function HomeWidgets({ showClock, showWeather, weatherLocation, hasWallpaper }: HomeWidgetsProps) {
+    const { i18n } = useTranslation();
     const [now, setNow] = useState(() => new Date());
 
     useEffect(() => {
-        if (!showClock) {
-            return;
-        }
+        if (!showClock) return;
 
         const update = () => setNow(new Date());
 
         update();
 
         const interval = window.setInterval(update, 1000);
-
         document.addEventListener('visibilitychange', update);
 
         return () => {
             window.clearInterval(interval);
-
             document.removeEventListener('visibilitychange', update);
         };
     }, [showClock]);
@@ -50,14 +43,13 @@ export default function HomeWidgets({
     return (
         <div
             className={cn(
-                'relative mx-auto grid w-full gap-3',
-                showClock && showWeather ? 'max-w-2xl grid-cols-1 sm:grid-cols-2' : 'max-w-sm grid-cols-1'
+                'relative mx-auto grid w-full gap-3 max-w-sm',
+                showClock && (showWeather && weatherLocation) ? 'max-w-2xl grid-cols-1 sm:grid-cols-2' : 'max-w-sm grid-cols-1'
             )}
         >
             {showClock && (
-                <section className={card}>
-                    <h2 className="text-[10px] uppercase tracking-widest text-theme-muted">{t('home.dateTime')}</h2>
-                    <time dateTime={now.toISOString()} className="flex flex-col gap-3">
+                <section className={cn(card, 'items-center justify-center')}>
+                    <time dateTime={now.toISOString()} className='flex flex-col items-center gap-3'>
                         <span className="text-3xl font-light tabular-nums tracking-tight text-theme-highlight sm:text-4xl">
                             {new Intl.DateTimeFormat(i18n.resolvedLanguage, {
                                 hour: '2-digit',
@@ -66,7 +58,7 @@ export default function HomeWidgets({
                                 hourCycle: 'h23'
                             }).format(now)}
                         </span>
-                        <span className="text-sm capitalize leading-relaxed text-theme-text">
+                        <span className='text-sm capitalize leading-relaxed text-theme-text'>
                             {new Intl.DateTimeFormat(i18n.resolvedLanguage, {
                                 weekday: 'long',
                                 day: 'numeric',
@@ -77,7 +69,10 @@ export default function HomeWidgets({
                     </time>
                 </section>
             )}
-            {showWeather && <WeatherWidget location={weatherLocation} className={card} />}
+
+            {showWeather && weatherLocation && (
+                <WeatherWidget location={weatherLocation} className={card} />
+            )}
         </div>
     );
 }

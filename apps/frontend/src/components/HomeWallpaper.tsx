@@ -1,40 +1,32 @@
-import { useState } from 'react';
-import { getWallpaperUrl } from '@/utils/wallpaper';
+import { useState } from 'react'
+import { getWallpaperUrl } from '@/utils/wallpaper'
 
-export default function HomeWallpaper({
-    wallpaper,
-    blur,
-    previewUrl
-}: {
+interface HomeWallpaper {
     wallpaper: string | null;
     blur: number;
-    previewUrl?: string | null;
-}) {
-    const [failedSource, setFailedSource] = useState<string | null>(null);
-    const source = previewUrl ?? getWallpaperUrl(wallpaper);
+}
 
-    if (!source || failedSource === source) {
-        return null;
-    }
+export default function HomeWallpaper({ wallpaper, blur }: HomeWallpaper) {
+    const [failedSource, setFailedSource] = useState<string | null>(null);
+
+    const source = getWallpaperUrl(wallpaper);
+    if (!source || failedSource === source) return
 
     return (
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div aria-hidden className='pointer-events-none absolute inset-0 overflow-hidden'>
             <div
-                className="absolute -inset-12"
-                style={{
-                    filter: `blur(${blur}px)`
-                }}
+                className='absolute -inset-12'
+                style={{ filter: `blur(${blur}px)` }}
             >
                 <img
                     src={source}
-                    alt=""
-                    referrerPolicy="no-referrer"
+                    referrerPolicy='no-referrer'
                     draggable={false}
                     onError={() => setFailedSource(source)}
-                    className="h-full w-full object-cover"
+                    className='h-full w-full object-cover'
                 />
             </div>
-            <div className="absolute inset-0 bg-black/35" />
+            <div className='absolute inset-0 bg-black/35' />
         </div>
     );
 }

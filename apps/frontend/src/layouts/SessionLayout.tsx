@@ -1,54 +1,33 @@
-import { useEffect, useLayoutEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import i18n, { getGuestLanguage } from '@/i18n';
-import { Outlet, useNavigate } from 'react-router';
-import { api } from '@/utils/axios';
-import { Gateway as gateway } from '@/utils/gateway';
-import { useGateway } from '@/hooks/useGateway';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import { MiniAppProvider, useMiniApp } from '@/contexts/MiniAppContext';
-import { ThemeProvider } from '@/contexts/ThemeContext';
-import MessageDialog from '@/components/MessageDialog';
-import ConnectionDialog from '@/components/ConnectionDialog';
+import { useEffect, useLayoutEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import i18n, { getGuestLanguage } from '@/i18n'
+import { Outlet, useNavigate } from 'react-router'
+import { api } from '@/utils/axios'
+import { Gateway as gateway } from '@/utils/gateway'
+import { useGateway } from '@/hooks/useGateway'
+import { useMiniApp } from '@/contexts/MiniAppContext'
+import MessageDialog from '@/components/MessageDialog'
+import ConnectionDialog from '@/components/ConnectionDialog'
 
 export default function SessionLayout() {
-    const { user } = useGateway();
-    const session = useMemo(
-        () => ({
-            user
-        }),
-        [user]
-    );
-
-    useEffect(() => {
-        gateway.start();
-
-        return () => gateway.stop();
-    }, []);
-
-    return (
-        <AuthProvider session={session}>
-            <ThemeProvider>
-                <MiniAppProvider>
-                    <SessionContent />
-                </MiniAppProvider>
-            </ThemeProvider>
-        </AuthProvider>
-    );
-}
-
-function SessionContent() {
     const { t } = useTranslation();
+    const { user } = useGateway();
     const { status, initialized, issue, retryAt, closeCode } = useGateway();
     const { apps, miniAppState, clearMiniApp } = useMiniApp();
-    const { user } = useAuth();
     const navigate = useNavigate();
+
     const language = user?.preferences.language ?? getGuestLanguage();
     const connected = status === 'ready';
 
+    useEffect(() => {
+        gateway.start();
+        return () => gateway.stop();
+    }, []);
+
+
     useLayoutEffect(() => {
         if (i18n.resolvedLanguage !== language) {
-            void i18n.changeLanguage(language);
+            i18n.changeLanguage(language);
         }
     }, [language]);
 
@@ -57,10 +36,7 @@ function SessionContent() {
             clearMiniApp();
         } else if (miniAppState && !apps.some((app) => app.path === miniAppState.path)) {
             clearMiniApp();
-
-            navigate('/', {
-                replace: true
-            });
+            navigate('/', { replace: true });
         }
     }, [user, apps, miniAppState, clearMiniApp, navigate]);
 
@@ -69,9 +45,7 @@ function SessionContent() {
             if (
                 !['/auth/login', '/auth/register', '/users/@me'].includes(error.requestUrl) &&
                 (error.status === 401 || error.code === 'USER_DISABLED')
-            ) {
-                gateway.reconnect();
-            }
+            ) gateway.reconnect();
 
             return Promise.reject(error);
         });
@@ -92,12 +66,8 @@ function SessionContent() {
                     action={t(issue === 'expired' ? 'dialogs.reconnect' : 'common.close')}
                     onClose={() => {
                         gateway.dismissIssue();
-
                         clearMiniApp();
-
-                        navigate('/auth/login', {
-                            replace: true
-                        });
+                        navigate('/auth/login', { replace: true });
                     }}
                 />
             )}
