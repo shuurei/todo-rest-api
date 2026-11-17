@@ -168,7 +168,7 @@ function TodoList() {
                         sortedTodos.map((todo) => (
                             <article
                                 key={todo.id}
-                                className="group flex items-center gap-4 border border-theme-border/20 bg-theme-surface/40 p-4 transition-colors hover:border-theme-border/50"
+                                className="group flex items-center gap-4 border border-theme-border/20 bg-theme-surface/40 p-4 hover:border-theme-border/50"
                             >
                                 <Checkbox
                                     checked={todo.isCompleted}

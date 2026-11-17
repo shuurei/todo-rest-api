@@ -340,7 +340,7 @@ function AdminUsers() {
                                     <article
                                         key={user.id}
                                         className={cn(
-                                            'flex min-w-0 flex-col gap-4 border border-theme-border/30 bg-theme-surface/40 p-4 transition-colors hover:border-theme-border/60',
+                                            'flex min-w-0 flex-col gap-4 border border-theme-border/30 bg-theme-surface/40 p-4 hover:border-theme-border/60',
                                             String(editing?.id) === String(user.id) && 'border-theme-accent'
                                         )}
                                     >

@@ -12,6 +12,7 @@ export const useWindowSize = () => {
             centerY: height / 2
         };
     };
+    
     const [windowSize, setWindowSize] = useState(getSize);
 
     useEffect(() => {
@@ -20,7 +21,6 @@ export const useWindowSize = () => {
         };
 
         window.addEventListener('resize', handleResize);
-
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 

@@ -60,6 +60,7 @@ export default {
         animations: 'Animations',
         miniApps: 'Mini-apps',
         transitionDuration: 'Transition duration',
+        themes: 'Themes',
         speed: {
             fast: 'Fast',
             normal: 'Normal',
@@ -75,6 +76,7 @@ export default {
         themePreview:
             'Click a theme to preview it immediately. Save to keep it; otherwise, leaving this category restores the saved theme.',
         theme: {
+            auto: 'Auto',
             green: 'Green',
             blue: 'Blue',
             purple: 'Purple',

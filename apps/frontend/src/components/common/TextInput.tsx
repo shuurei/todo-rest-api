@@ -1,17 +1,18 @@
-import type { InputHTMLAttributes } from 'react';
+import type { InputHTMLAttributes, Ref } from 'react';
 import { cn } from '@/utils/cn';
 import ScrambleText from '../ScrambleText';
 
 interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
     label: string;
+    ref?: Ref<HTMLInputElement>;
     error?: string | null;
     showLabelError?: boolean;
 }
 
-export default function TextInput({ id, label, error, showLabelError = true, className, ...props }: TextInputProps) {
+const TextInput = ({ id, label, error, showLabelError = true, className, ...props }: TextInputProps) => {
     return (
-        <div className="space-y-3">
-            <label className="text-xs font-bold uppercase tracking-widest text-theme-highlight">
+        <div className='space-y-3'>
+            <label className='text-xs font-bold uppercase tracking-widest text-theme-highlight'>
                 <ScrambleText text={label} duration={500} />
 
                 <input
@@ -30,8 +31,10 @@ export default function TextInput({ id, label, error, showLabelError = true, cla
             </label>
 
             {showLabelError && error && error.length > 0 && (
-                <ScrambleText as="p" className="text-red-400 text-xs mt-0.5" text={error} />
+                <ScrambleText as='p' className='text-red-400 text-xs mt-0.5' text={error} />
             )}
         </div>
     );
-}
+};
+
+export default TextInput;

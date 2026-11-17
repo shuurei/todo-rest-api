@@ -1,10 +1,10 @@
 import { useSyncExternalStore } from 'react';
 import { Gateway as gateway } from '@/utils/gateway';
 
-export function useGateway() {
+export const useGateway = () => {
     return useSyncExternalStore(gateway.subscribe, gateway.getSnapshot);
 }
 
-export function useUserProfile(userId: string) {
+export const useUserProfile = (userId: string) => {
     return useGateway().users[String(userId)] ?? null;
 }

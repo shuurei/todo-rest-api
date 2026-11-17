@@ -1,15 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-
 @import "tailwindcss";
 
 @theme {
-    --font-roboto: 'Roboto', sans-serif;
     --animate-blink: blink 1s step-start infinite;
 
     @keyframes blink {
         0%, 100% { opacity: 1; }
         50% { opacity: 0; }
     }
+}
+
+*::-webkit-scrollbar {
+    display: none;
 }
 
 :root {
@@ -83,13 +84,11 @@
 
 .wallpaper-blur-slider::-webkit-slider-runnable-track {
     height: 4px;
-    border-radius: 999px;
     background: var(--palette-border);
 }
 
 .wallpaper-blur-slider::-moz-range-track {
     height: 4px;
-    border-radius: 999px;
     background: var(--palette-border);
 }
 
@@ -99,9 +98,7 @@
     height: 18px;
     margin-top: -7px;
     border: 2px solid var(--palette-surface);
-    border-radius: 50%;
     background: var(--palette-accent);
-    transition: box-shadow 150ms ease, transform 150ms ease;
 }
 
 .wallpaper-blur-slider::-moz-range-thumb {
@@ -111,15 +108,6 @@
     border: 2px solid var(--palette-surface);
     border-radius: 50%;
     background: var(--palette-accent);
-    transition: box-shadow 150ms ease, transform 150ms ease;
-}
-
-.wallpaper-blur-slider:is(:hover, :focus-visible)::-webkit-slider-thumb {
-    box-shadow: 0 0 0 5px color-mix(in srgb, var(--palette-accent) 18%, transparent);
-}
-
-.wallpaper-blur-slider:is(:hover, :focus-visible)::-moz-range-thumb {
-    box-shadow: 0 0 0 5px color-mix(in srgb, var(--palette-accent) 18%, transparent);
 }
 
 .wallpaper-blur-slider:active::-webkit-slider-thumb {
@@ -137,7 +125,7 @@
 
 @layer base {
     body {
-        @apply font-mono bg-theme-page min-h-svh font-roboto w-full flex justify-center;
+        @apply font-mono bg-theme-page min-h-svh w-full flex justify-center;
     }
 
     #root {

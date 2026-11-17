@@ -94,7 +94,7 @@ export default function ProgressBar({
                             <span
                                 key={index}
                                 className={cn(
-                                    'size-6.5 flex-1 bg-theme-deep transition-colors duration-100',
+                                    'size-6.5 flex-1 bg-theme-deep duration-100',
                                     isActive && 'bg-theme-accent'
                                 )}
                             />

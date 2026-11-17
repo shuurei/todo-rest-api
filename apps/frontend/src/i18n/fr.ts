@@ -74,9 +74,10 @@ export default {
         restoreDefaults: 'Rétablir les valeurs par défaut',
         saved: 'Préférences enregistrées.',
         languageHelp: 'La langue est appliquée à l’enregistrement des préférences.',
-        themePreview:
-            'Cliquez sur un thème pour le prévisualiser immédiatement. Enregistrez pour le conserver ; sinon, quitter cette catégorie rétablit le thème enregistré.',
+        themePreview: 'Cliquez sur un thème pour le prévisualiser immédiatement. Enregistrez pour le conserver ; sinon, quitter cette catégorie rétablit le thème enregistré.',
+        themes: 'Thèmes',
         theme: {
+            auto: 'Auto',
             green: 'Vert',
             blue: 'Bleu',
             purple: 'Violet',

@@ -17,7 +17,7 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     const { user } = useAuth();
 
     const [preview, setPreview] = useState<ThemePreview | null>(null);
@@ -40,19 +40,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         if (!source) return;
 
         let active = true;
-
-        const timer = window.setTimeout(() => {
-            extractImagePalette(source).then((palette) => {
-                if (active) {
-                    setResult({ source, palette });
-                }
-            });
-        }, 350);
-
-        return () => {
-            active = false;
-            window.clearTimeout(timer);
-        };
+        void extractImagePalette(source).then((palette) => {
+            if (active) setResult({ source, palette });
+        });
+        return () => { active = false; };
     }, [source]);
 
     const palette = source && result?.source === source ? result.palette : null;
@@ -88,9 +79,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             {children}
         </ThemeContext.Provider>
     );
-}
+};
 
-export function useTheme() {
+export const useTheme = () => {
     const context = useContext(ThemeContext);
 
     if (!context) {
@@ -98,19 +89,19 @@ export function useTheme() {
     }
 
     return context;
-}
+};
 
-export function useThemePreview(preview: ThemePreview | null) {
+export const useThemePreview = (preview: ThemePreview | null) => {
     const { setPreview } = useTheme();
+
     const enabled = preview !== null;
     const color = preview?.themeColor;
     const dynamic = preview?.themeFromWallpaper;
     const wallpaper = preview?.homeWallpaper;
+    const wallpaperPreviewUrl = preview?.wallpaperPreviewUrl;
 
     useLayoutEffect(() => {
-        if (!enabled) {
-            return;
-        }
+        if (!enabled) return;
 
         const override: ThemePreview = {};
 
@@ -126,8 +117,12 @@ export function useThemePreview(preview: ThemePreview | null) {
             override.homeWallpaper = wallpaper;
         }
 
+        if (wallpaperPreviewUrl !== undefined) {
+            override.wallpaperPreviewUrl = wallpaperPreviewUrl;
+        }
+
         setPreview(override);
 
         return () => setPreview(null);
-    }, [enabled, color, dynamic, wallpaper, setPreview]);
-}
+    }, [enabled, color, dynamic, wallpaper, wallpaperPreviewUrl, setPreview]);
+};

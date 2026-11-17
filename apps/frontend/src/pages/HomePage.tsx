@@ -34,10 +34,9 @@ export default function HomePage() {
             origin: event.currentTarget.getBoundingClientRect()
         });
     };
+    
     const handleAnimationComplete = () => {
-        if (!miniAppState) {
-            return;
-        }
+        if (!miniAppState) return;
 
         if (!miniAppState.isOpen) {
             return clearMiniApp();
@@ -56,6 +55,7 @@ export default function HomePage() {
                 weatherLocation={settings.homeWeatherLocation}
                 hasWallpaper={!!settings.homeWallpaper}
             />
+
             <HomeApps
                 apps={apps}
                 miniAppState={miniAppState}

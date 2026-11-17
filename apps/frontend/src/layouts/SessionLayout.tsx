@@ -24,7 +24,6 @@ export default function SessionLayout() {
         return () => gateway.stop();
     }, []);
 
-
     useLayoutEffect(() => {
         if (i18n.resolvedLanguage !== language) {
             i18n.changeLanguage(language);
@@ -43,8 +42,8 @@ export default function SessionLayout() {
     useEffect(() => {
         const id = api.interceptors.response.use(undefined, (error) => {
             if (
-                !['/auth/login', '/auth/register', '/users/@me'].includes(error.requestUrl) &&
-                (error.status === 401 || error.code === 'USER_DISABLED')
+                !['/auth/login', '/auth/register', '/users/@me'].includes(error.requestUrl)
+                && (error.status === 401 || error.code === 'USER_DISABLED')
             ) gateway.reconnect();
 
             return Promise.reject(error);
@@ -58,7 +57,14 @@ export default function SessionLayout() {
             <div hidden={!connected} inert={!connected}>
                 {initialized && !issue && <Outlet />}
             </div>
-            {!connected && <ConnectionDialog retryAt={retryAt} fatalCode={status === 'fatal' ? closeCode : null} />}
+
+            {!connected && (
+                <ConnectionDialog
+                    retryAt={retryAt}
+                    fatalCode={status === 'fatal' ? closeCode : null}
+                />
+            )}
+
             {connected && issue && (
                 <MessageDialog
                     title={t(issue === 'disabled' ? 'dialogs.disabledTitle' : 'dialogs.sessionExpiredTitle')}

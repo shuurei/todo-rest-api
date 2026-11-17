@@ -3,12 +3,13 @@ import AuthLayout from './layouts/AuthLayout';
 import GuestLayout from './layouts/GuestLayout';
 import AuthPage from './pages/AuthPage';
 import TodoPage from './pages/TodoPage';
-import SettingsPage from './pages/SettingsPage';
-import PreferencesPage from './pages/PreferencesPage';
-import DevicesPage from './pages/DevicesPage';
+import SettingsPage from './pages/settings/SettingsPage';
+import AppearancePage from './pages/settings/AppearancePage';
+import LanguagePage from './pages/settings/LanguagePage';
+import DevicesPage from './pages/settings/DevicesPage';
 import HomePage from './pages/HomePage';
-import HomeSettingsPage from './pages/HomeSettingsPage';
-import UserPage from './pages/UserPage';
+import HomeSettingsPage from './pages/settings/HomeSettingsPage';
+import AccountPage from './pages/settings/AccountPage';
 import SessionLayout from './layouts/SessionLayout';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminPage from './pages/AdminPage';
@@ -61,7 +62,7 @@ const router = createBrowserRouter([
                             },
                             {
                                 path: 'account',
-                                element: <UserPage />
+                                element: <AccountPage />
                             },
                             {
                                 path: 'home',
@@ -69,11 +70,11 @@ const router = createBrowserRouter([
                             },
                             {
                                 path: 'appearance',
-                                element: <PreferencesPage category="appearance" />
+                                element: <AppearancePage />
                             },
                             {
                                 path: 'language',
-                                element: <PreferencesPage category="language" />
+                                element: <LanguagePage />
                             },
                             {
                                 path: 'devices',

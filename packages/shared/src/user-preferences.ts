@@ -12,7 +12,7 @@ export type HomeAppPath = (typeof homeAppPaths)[number];
 
 export const maxWallpaperBlur = 30;
 
-export const transitionSpeeds = [0.8, 1.2, 2.2] as const;
+export const transitionSpeeds = [2.2, 1.2, 0.8] as const;
 
 export type TransitionSpeed = (typeof transitionSpeeds)[number];
 
@@ -38,7 +38,7 @@ export interface UserPreferences {
 export const defaultUserPreferences: Readonly<UserPreferences> = {
     language: 'fr',
     themeColor: 'green',
-    themeFromWallpaper: false,
+    themeFromWallpaper: true,
     transitionDuration: 1,
     homeWallpaper: null,
     homeWallpaperBlur: 0,

@@ -36,7 +36,7 @@ Modal.Footer = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivE
 
 export function Modal({ children, className, ...props }: HTMLMotionProps<'div'>) {
     return (
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode='wait'>
             <motion.div
                 {...props}
                 initial={{

@@ -425,7 +425,7 @@ export default function HomeApps({ apps, miniAppState, appRefs, onOpen, hasWallp
                                     appRefs.current[app.path] = element;
                                 }}
                                 className={cn(
-                                    'relative flex size-18 shrink-0 items-center justify-center border border-theme-border/40 bg-theme-surface/95 text-theme-muted transition-colors group-hover:border-theme-accent group-hover:text-theme-highlight',
+                                    'relative flex size-18 shrink-0 items-center justify-center border border-theme-border/40 bg-theme-surface/95 text-theme-muted group-hover:border-theme-accent group-hover:text-theme-highlight',
                                     dragging === app.path && 'border-dashed border-theme-accent'
                                 )}
                             >

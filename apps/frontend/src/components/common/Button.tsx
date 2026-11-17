@@ -11,7 +11,7 @@ export default function Button({ children, loading = false, disabled, className,
             disabled={disabled || loading}
             className={cn(
                 'outline-none flex w-full items-center justify-center gap-2 px-4 py-3 cursor-pointer',
-                'text-sm font-semibold transition-all duration-200',
+                'text-sm font-semibold duration-200',
                 'disabled:cursor-not-allowed disabled:opacity-50',
                 className
             )}
