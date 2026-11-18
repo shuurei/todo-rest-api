@@ -24,7 +24,7 @@ export default {
         admin: 'Admin'
     },
     connection: {
-        unavailable: 'Server unavailable',
+        unavailable: 'The servers are unreachable',
         fatal: 'Connection stopped (code {{code}}). Check the configuration or reload the application.',
         reload: 'Reload',
         description:
@@ -35,8 +35,11 @@ export default {
     },
     auth: {
         loginProtocol: 'Login protocol',
+        logoutProtocol: 'Logout protocol',
+        reconnectProtocol: 'Reconnecting',
         registerProtocol: 'Registration protocol',
         online: 'System online',
+        offline: 'System offline',
         usernamePlaceholder: 'username',
         initializeSession: 'Initialize session',
         createIdentity: 'Create identity',
@@ -87,6 +90,8 @@ export default {
     },
     home: {
         applications: 'Applications',
+        clock: 'Clock',
+        weather: 'Weather',
         dateTime: 'Date and time',
         dragHelp:
             'Hold an app, move it, then release to save its position. Keyboard: Alt + arrow keys to move, Escape to cancel dragging.',
@@ -97,12 +102,39 @@ export default {
         title: 'Home screen',
         categoryDescription: 'Wallpaper, widgets and application order',
         wallpaper: 'Wallpaper',
+        wallpaperMode: 'Wallpaper mode',
+        wallpaperEverywhere: 'Shared',
+        wallpaperSplit: 'Per screen',
+        wallpaperModeHelp: 'Shared: one image for all screens. Per screen: Mobile below 640 px, Tablet from 640 to 1023 px and Desktop from 1024 px. Without an image, the base theme colour is kept.',
+        changeWallpaper: 'Change image',
+        wallpaperFormats: {
+            homeWallpaper: 'Shared preview · cropped to fit each screen',
+            homeWallpaperDesktop: 'Landscape 16:9 · screens from 1024 px',
+            homeWallpaperTablet: 'Portrait 3:4 · screens from 640 to 1023 px',
+            homeWallpaperMobile: 'Portrait 9:19.5 · screens below 640 px'
+        },
+        wallpaperTargets: {
+            homeWallpaper: 'Shared',
+            homeWallpaperDesktop: 'Desktop',
+            homeWallpaperTablet: 'Tablet',
+            homeWallpaperMobile: 'Mobile'
+        },
         uploadImage: 'Upload an image',
         removeWallpaper: 'Remove',
         uploadHelp:
             'JPEG, PNG, WebP or GIF, up to 10 MB. Stored as a high-quality JPEG (GIFs become static). Select a photo and save to upload it along with your preferences. Anyone with the link can access the image.',
         blur: 'Wallpaper blur',
         widgets: 'Widgets',
+        widgetPosition: 'Position',
+        widgetSize: 'Size',
+        appsAlignment: 'Application placement',
+        appsLeft: 'All on the left',
+        appsCenter: 'Centered horizontally',
+        positions: {
+            'top-left': 'Top left',
+            'top-center': 'Top center',
+            'top-right': 'Top right'
+        },
         showClock: 'Show date and time (with seconds)',
         showWeather: 'Show weather',
         orderHelp:
@@ -167,15 +199,50 @@ export default {
         empty: 'No active sessions.'
     },
     todo: {
-        title: 'Todo List',
+        title: 'My tasks',
+        workspace: 'Personal workspace',
+        subtitle: 'One thing at a time.',
         titleLabel: 'Task title',
-        titlePlaceholder: 'Enter a task…',
-        createTask: 'Create task',
+        titlePlaceholder: 'What is the next step?',
+        titleHint: 'The title must contain between 3 and 200 characters.',
+        createTask: 'Add a task',
+        add: 'Add',
         tasks: 'Tasks',
         entries_one: '{{count}} entry',
         entries_other: '{{count}} entries',
-        noTasks: 'No tasks found',
-        firstObjective: 'Create your first objective'
+        progress: 'Progress',
+        filterLabel: 'Filter tasks',
+        filters: { all: 'All', active: 'To do', completed: 'Completed' },
+        sortLabel: 'Sort tasks',
+        sorts: { newest: 'Newest first', oldest: 'Oldest first', alphabetical: 'A to Z' },
+        search: 'Search tasks',
+        searchPlaceholder: 'Search tasks…',
+        clearSearch: 'Clear search',
+        resetFilters: 'Show all tasks',
+        noTasks: 'It starts with a first task.',
+        firstObjective: 'Capture your next idea, action or goal.',
+        noResults: 'No matching tasks.',
+        searchHelp: 'Try another word or show all your tasks.',
+        allDone: 'All caught up.',
+        allDoneHelp: 'Nothing left to do for now. Enjoy the break.',
+        noCompleted: 'No completed tasks yet.',
+        noCompletedHelp: 'Your completed tasks will appear here.',
+        completeTask: 'Complete: {{title}}',
+        reopenTask: 'Mark as to do: {{title}}',
+        editTask: 'Edit: {{title}}',
+        deleteTask: 'Delete: {{title}}',
+        clearCompleted: 'Clear completed',
+        deleteTitle: 'Delete this task?',
+        deleteConfirm: '“{{title}}” will be deleted.',
+        deleteCompletedTitle: 'Delete completed tasks?',
+        deleteCompletedConfirm_one: 'The selected completed task will be deleted.',
+        deleteCompletedConfirm_other: 'The {{count}} selected completed tasks will be deleted.',
+        deleteWarning: 'This action cannot be undone.',
+        retry: 'Try again',
+        feedback: {
+            created: 'Task added.', updated: 'Task updated.', completed: 'Task completed.', reopened: 'Task marked as to do.',
+            deleted_one: 'One task deleted.', deleted_other: '{{count}} tasks deleted.'
+        }
     },
     account: {
         displayName: 'Display name',

@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Language } from '@todo/shared';
+import type { Language } from '@nodus/shared';
 import { isLanguage } from '@/i18n';
 
 export default function LanguageSelect({
@@ -14,7 +14,7 @@ export default function LanguageSelect({
     const { t } = useTranslation();
 
     return (
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 cursor-pointer">
             <label htmlFor={id} className="text-xs uppercase tracking-widest text-theme-muted">
                 {t('common.language')}
             </label>

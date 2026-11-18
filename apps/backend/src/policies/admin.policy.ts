@@ -1,4 +1,4 @@
-import { hasFlag, UserFlags } from '@todo/shared';
+import { hasFlag, UserFlags } from '@nodus/shared';
 import type { User } from '../entities/user.entity';
 
 export class AdminPolicy {

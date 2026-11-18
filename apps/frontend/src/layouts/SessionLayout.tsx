@@ -1,20 +1,21 @@
 import { useEffect, useLayoutEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import i18n, { getGuestLanguage } from '@/i18n'
-import { Outlet, useNavigate } from 'react-router'
+import { Outlet, useLocation, useNavigate } from 'react-router'
 import { api } from '@/utils/axios'
 import { Gateway as gateway } from '@/utils/gateway'
 import { useGateway } from '@/hooks/useGateway'
 import { useMiniApp } from '@/contexts/MiniAppContext'
 import MessageDialog from '@/components/MessageDialog'
-import ConnectionDialog from '@/components/ConnectionDialog'
+import AuthPage from '@/pages/AuthPage'
 
 export default function SessionLayout() {
     const { t } = useTranslation();
-    const { user } = useGateway();
-    const { status, initialized, issue, retryAt, closeCode } = useGateway();
+    const { user, status, initialized, issue } = useGateway();
     const { apps, miniAppState, clearMiniApp } = useMiniApp();
     const navigate = useNavigate();
+    const { pathname } = useLocation();
+    const isAuthRoute = pathname === '/auth' || pathname.startsWith('/auth/');
 
     const language = user?.preferences.language ?? getGuestLanguage();
     const connected = status === 'ready';
@@ -25,10 +26,12 @@ export default function SessionLayout() {
     }, []);
 
     useLayoutEffect(() => {
+        if (!connected) return;
+
         if (i18n.resolvedLanguage !== language) {
-            i18n.changeLanguage(language);
+            void i18n.changeLanguage(language);
         }
-    }, [language]);
+    }, [language, connected]);
 
     useEffect(() => {
         if (!user) {
@@ -52,31 +55,24 @@ export default function SessionLayout() {
         return () => api.interceptors.response.eject(id);
     }, []);
 
-    return (
-        <>
-            <div hidden={!connected} inert={!connected}>
-                {initialized && !issue && <Outlet />}
-            </div>
+    if (!connected && !(isAuthRoute && !user)) {
+        return <AuthPage />
+    }
 
-            {!connected && (
-                <ConnectionDialog
-                    retryAt={retryAt}
-                    fatalCode={status === 'fatal' ? closeCode : null}
-                />
-            )}
+    if (connected && issue) {
+        return <MessageDialog
+            title={t(issue === 'disabled' ? 'dialogs.disabledTitle' : 'dialogs.sessionExpiredTitle')}
+            message={t(issue === 'disabled' ? 'dialogs.disabledMessage' : 'dialogs.sessionExpiredMessage')}
+            action={t(issue === 'expired' ? 'dialogs.reconnect' : 'common.close')}
+            onClose={() => {
+                gateway.dismissIssue();
+                clearMiniApp();
+                navigate('/auth/login', { replace: true });
+            }}
+        />
+    }
 
-            {connected && issue && (
-                <MessageDialog
-                    title={t(issue === 'disabled' ? 'dialogs.disabledTitle' : 'dialogs.sessionExpiredTitle')}
-                    message={t(issue === 'disabled' ? 'dialogs.disabledMessage' : 'dialogs.sessionExpiredMessage')}
-                    action={t(issue === 'expired' ? 'dialogs.reconnect' : 'common.close')}
-                    onClose={() => {
-                        gateway.dismissIssue();
-                        clearMiniApp();
-                        navigate('/auth/login', { replace: true });
-                    }}
-                />
-            )}
-        </>
-    );
+    if (initialized || (isAuthRoute && !user)) {
+        return <Outlet />
+    }
 }

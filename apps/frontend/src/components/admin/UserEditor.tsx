@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { hasFlag, UserFlags } from '@todo/shared';
+import { hasFlag, UserFlags } from '@nodus/shared';
 import { AdminAPI, type AdminUserUpdate } from '@/api/AdminAPI';
 import Button from '@/components/common/Button';
 import Checkbox from '@/components/common/Checkbox';
@@ -138,7 +138,7 @@ export default function UserEditor({
                             }}
                         />
                     ))}
-                    <p className="text-[10px] text-theme-dim">
+                    <p className="text-2xs text-theme-dim">
                         {t('admin.flagValue', {
                             value: flags
                         })}

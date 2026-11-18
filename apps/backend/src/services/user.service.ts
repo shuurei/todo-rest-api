@@ -5,7 +5,7 @@ import { Session } from '../entities/session.entity';
 import { emitGatewayEvent } from '../wss/events';
 import { CreateUserInput, UpdateUserInput } from '../validators/user.schema';
 import { HttpConflictError, HttpNotFoundError } from '../utils/http-errors';
-import { normalizeUserPreferences, type UserPreferences } from '@todo/shared';
+import { normalizeUserPreferences, type UserPreferences } from '@nodus/shared';
 import type { UpdateUserPreferencesInput } from '../validators/user-preferences.schema';
 import type { AdminUpdateUserInput, SearchUsersInput } from '../validators/admin.schema';
 

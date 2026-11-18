@@ -1,10 +1,15 @@
-import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from 'react'
-import { defaultUserPreferences, type UserPreferences } from '@todo/shared'
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from 'react'
+import { defaultUserPreferences, type UserPreferences } from '@nodus/shared'
 import { useAuth } from '@/contexts/AuthContext'
+import { useGateway } from '@/hooks/useGateway'
 import { extractImagePalette, type ImagePalette } from '@/utils/image-palette'
 import { getWallpaperUrl } from '@/utils/wallpaper'
+import { useWallpaperField } from '@/hooks/useWallpaperField'
 
-type ThemePreview = Partial<Pick<UserPreferences, 'themeColor' | 'themeFromWallpaper' | 'homeWallpaper'>> & {
+type ThemePreview = Partial<Pick<UserPreferences,
+    'themeColor' | 'themeFromWallpaper' | 'homeWallpaper' | 'homeWallpaperMode'
+    | 'homeWallpaperDesktop' | 'homeWallpaperTablet' | 'homeWallpaperMobile'
+>> & {
     wallpaperPreviewUrl?: string | null;
 };
 
@@ -13,12 +18,14 @@ type DynamicStatus = 'idle' | 'loading' | 'ready' | 'unavailable';
 interface ThemeContextValue {
     setPreview: (preview: ThemePreview | null) => void;
     dynamicStatus: DynamicStatus;
+    claimWallpaperReveal: (source: string) => boolean;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     const { user } = useAuth();
+    const { unavailable } = useGateway();
 
     const [preview, setPreview] = useState<ThemePreview | null>(null);
 
@@ -27,9 +34,17 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
         ...preview
     };
 
-    const source = preferences.themeFromWallpaper
-        ? (preview?.wallpaperPreviewUrl ?? getWallpaperUrl(preferences.homeWallpaper))
-        : null;
+    const wallpaperField = useWallpaperField(preferences.homeWallpaperMode);
+    const wallpaperSource = preview?.wallpaperPreviewUrl !== undefined
+        ? preview.wallpaperPreviewUrl : getWallpaperUrl(preferences[wallpaperField]);
+    const source = preferences.themeFromWallpaper ? wallpaperSource : null;
+    const revealState = useMemo(() => ({ source: wallpaperSource, revealed: false }), [user?.id, wallpaperSource]);
+    const claimWallpaperReveal = useCallback((nextSource: string) => {
+        if (nextSource !== revealState.source) return true;
+        const shouldReveal = !revealState.revealed;
+        revealState.revealed = true;
+        return shouldReveal;
+    }, [revealState]);
 
     const [result, setResult] = useState<{
         source: string;
@@ -39,11 +54,9 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         if (!source) return;
 
-        let active = true;
-        void extractImagePalette(source).then((palette) => {
-            if (active) setResult({ source, palette });
+        extractImagePalette(source).then((palette) => {
+            setResult({ source, palette });
         });
-        return () => { active = false; };
     }, [source]);
 
     const palette = source && result?.source === source ? result.palette : null;
@@ -58,21 +71,24 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     useLayoutEffect(() => {
         const root = document.documentElement;
 
-        root.dataset.theme = palette ? 'dynamic' : preferences.themeColor;
+        const activePalette = unavailable ? { hue: 25, saturation: 1 } : palette;
 
-        if (palette) {
-            root.style.setProperty('--dynamic-hue', String(palette.hue));
-            root.style.setProperty('--dynamic-saturation', String(palette.saturation));
+        root.dataset.theme = activePalette ? 'dynamic' : preferences.themeColor;
+
+        if (activePalette) {
+            root.style.setProperty('--dynamic-hue', String(activePalette.hue));
+            root.style.setProperty('--dynamic-saturation', String(activePalette.saturation));
         } else {
             root.style.removeProperty('--dynamic-hue');
             root.style.removeProperty('--dynamic-saturation');
         }
-    }, [preferences.themeColor, palette]);
+    }, [preferences.themeColor, palette, unavailable]);
 
     const value = useMemo(() => ({
         setPreview,
-        dynamicStatus
-    }), [dynamicStatus]);
+        dynamicStatus,
+        claimWallpaperReveal
+    }), [dynamicStatus, claimWallpaperReveal]);
 
     return (
         <ThemeContext.Provider value={value}>
@@ -98,6 +114,10 @@ export const useThemePreview = (preview: ThemePreview | null) => {
     const color = preview?.themeColor;
     const dynamic = preview?.themeFromWallpaper;
     const wallpaper = preview?.homeWallpaper;
+    const wallpaperMode = preview?.homeWallpaperMode;
+    const wallpaperDesktop = preview?.homeWallpaperDesktop;
+    const wallpaperTablet = preview?.homeWallpaperTablet;
+    const wallpaperMobile = preview?.homeWallpaperMobile;
     const wallpaperPreviewUrl = preview?.wallpaperPreviewUrl;
 
     useLayoutEffect(() => {
@@ -117,6 +137,11 @@ export const useThemePreview = (preview: ThemePreview | null) => {
             override.homeWallpaper = wallpaper;
         }
 
+        if (wallpaperMode !== undefined) override.homeWallpaperMode = wallpaperMode;
+        if (wallpaperDesktop !== undefined) override.homeWallpaperDesktop = wallpaperDesktop;
+        if (wallpaperTablet !== undefined) override.homeWallpaperTablet = wallpaperTablet;
+        if (wallpaperMobile !== undefined) override.homeWallpaperMobile = wallpaperMobile;
+
         if (wallpaperPreviewUrl !== undefined) {
             override.wallpaperPreviewUrl = wallpaperPreviewUrl;
         }
@@ -124,5 +149,5 @@ export const useThemePreview = (preview: ThemePreview | null) => {
         setPreview(override);
 
         return () => setPreview(null);
-    }, [enabled, color, dynamic, wallpaper, wallpaperPreviewUrl, setPreview]);
+    }, [enabled, color, dynamic, wallpaper, wallpaperMode, wallpaperDesktop, wallpaperTablet, wallpaperMobile, wallpaperPreviewUrl, setPreview]);
 };

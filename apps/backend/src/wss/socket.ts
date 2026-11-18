@@ -1,6 +1,6 @@
 import type { IncomingMessage } from 'node:http';
 import { WebSocket, type RawData } from 'ws';
-import { GatewayOpcode as Op, GatewayCloseCode as Close } from '@todo/shared';
+import { GatewayOpcode as Op, GatewayCloseCode as Close } from '@nodus/shared';
 import type { GatewaySession } from './session';
 
 interface ConnectionHandlers {

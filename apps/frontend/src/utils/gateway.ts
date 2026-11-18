@@ -1,4 +1,4 @@
-import { GatewayOpcode as Op, GatewayCloseCode as Close, fatalGatewayCloseCodes, gatewayVersion, type GatewayDispatch, type GatewayTodo, type GatewaySession, type GatewayUserProfile, type SessionIssue } from '@todo/shared'
+import { GatewayOpcode as Op, GatewayCloseCode as Close, fatalGatewayCloseCodes, gatewayVersion, type GatewayDispatch, type GatewayTodo, type GatewaySession, type GatewayUserProfile, type SessionIssue } from '@nodus/shared'
 import type { User } from '@/types/user'
 import { api } from '@/utils/axios'
 import { GatewaySocket } from './gateway-socket'
@@ -6,6 +6,8 @@ import { GatewaySocket } from './gateway-socket'
 export interface GatewayState {
     status: 'connecting' | 'offline' | 'ready' | 'fatal';
     initialized: boolean;
+    unavailable: boolean;
+    transition: 'logout' | null;
     user: User | null;
     users: Record<string, GatewayUserProfile>;
     issue: SessionIssue;
@@ -22,6 +24,8 @@ export class Gateway {
     private static state: GatewayState = {
         status: 'connecting',
         initialized: false,
+        unavailable: false,
+        transition: null,
         user: null,
         users: {},
         issue: null,
@@ -37,6 +41,7 @@ export class Gateway {
 
     private static socket: GatewaySocket | null = null;
     private static retryTimer: ReturnType<typeof setTimeout> | undefined;
+    private static attemptTimer: ReturnType<typeof setTimeout> | undefined;
     private static started = false;
     private static anonymous = false;
 
@@ -65,10 +70,10 @@ export class Gateway {
         queueMicrotask(() => this.connect());
     }
 
-    static reconnect() {
+    static reconnect(transition: 'logout' | null = null) {
         this.anonymous = false;
 
-        this.update({ status: 'connecting', issue: null });
+        this.update({ status: 'connecting', issue: null, transition });
 
         this.connect();
     }
@@ -132,6 +137,7 @@ export class Gateway {
     }
 
     private static detach() {
+        clearTimeout(this.attemptTimer);
         this.socket?.dispose();
         this.socket = null;
     }
@@ -161,16 +167,29 @@ export class Gateway {
         this.detach();
         this.update({ status: 'connecting', retryAt: null });
 
+        const startedAt = performance.now();
+        const finishAttempt = (callback: () => void) => {
+            clearTimeout(this.attemptTimer);
+            this.attemptTimer = setTimeout(callback, Math.max(0, 3000 - (performance.now() - startedAt)));
+        };
+
         try {
             this.socket = new GatewaySocket(this.socketUrl(), {
                 hello: () => this.socket?.send(Op.Identify, { anonymous: this.anonymous }),
-                dispatch: (packet) => this.dispatch(packet),
-                close: (code, reason) => this.onClose(code, reason),
-                reconnect: () => this.schedule(0),
+                dispatch: (packet) => {
+                    if (packet.t === 'READY') {
+                        this.socket?.completeHandshake();
+                        finishAttempt(() => this.dispatch(packet));
+                    } else {
+                        this.dispatch(packet);
+                    }
+                },
+                close: (code, reason) => finishAttempt(() => this.onClose(code, reason)),
+                reconnect: () => finishAttempt(() => this.schedule(0)),
                 latency: (latency) => this.update({ latency })
             });
         } catch {
-            this.schedule();
+            finishAttempt(() => this.schedule());
         }
     }
 
@@ -183,7 +202,11 @@ export class Gateway {
             return;
         }
 
-        this.update({ status: 'offline', retryAt: Date.now() + delay });
+        this.update({
+            status: delay > 0 ? 'offline' : 'connecting',
+            unavailable: delay > 0 || this.state.unavailable,
+            retryAt: Date.now() + delay
+        });
 
         this.retryTimer = setTimeout(() => this.connect(), delay);
     }
@@ -195,6 +218,7 @@ export class Gateway {
 
         this.update({
             status: 'fatal',
+            unavailable: true,
             retryAt: null,
             closeCode: code
         });
@@ -241,6 +265,8 @@ export class Gateway {
                 this.update({
                     status: 'ready',
                     initialized: true,
+                    unavailable: false,
+                    transition: null,
                     retryAt: null,
                     closeCode: null,
                     user: packet.d.user,

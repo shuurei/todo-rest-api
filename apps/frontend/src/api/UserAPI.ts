@@ -2,7 +2,7 @@ import { api } from '@/utils/axios';
 import { Gateway as gateway } from '@/utils/gateway';
 import type { ApiResponse } from '@/types/api';
 import type { User } from '@/types/user';
-import type { UserPreferences } from '@todo/shared';
+import { homeWallpaperFields, type HomeWallpaperField, type UserPreferences } from '@nodus/shared';
 
 export class UserAPI {
     static get api() {
@@ -21,13 +21,16 @@ export class UserAPI {
         return await api.get<ApiResponse<User>>(`/users/${userId}`);
     }
 
-    static async updatePreferences(payload: Partial<UserPreferences>, wallpaper?: File | null) {
-        if (wallpaper) {
+    static async updatePreferences(payload: Partial<UserPreferences>, wallpapers?: Partial<Record<HomeWallpaperField, File | null>>) {
+        if (wallpapers && homeWallpaperFields.some((field) => wallpapers[field])) {
             const formData = new FormData();
 
             formData.set('preferences', JSON.stringify(payload));
 
-            formData.set('homeWallpaper', wallpaper);
+            for (const field of homeWallpaperFields) {
+                const file = wallpapers[field];
+                if (file) formData.set(field, file);
+            }
 
             return await api.patch<ApiResponse<UserPreferences>>('/users/@me/preferences', formData, {
                 headers: {

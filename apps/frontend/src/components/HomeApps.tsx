@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type MouseEvent, type PointerEvent, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router';
-import { motion, useMotionValue, useReducedMotion } from 'motion/react';
+import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform, useVelocity } from 'motion/react';
 import { useTranslation } from 'react-i18next';
-import type { HomeAppPath } from '@todo/shared';
+import type { HomeAppPath, HomeAppsAlignment } from '@nodus/shared';
 import { UserAPI } from '@/api/UserAPI';
 import { useAuth } from '@/contexts/AuthContext';
 import type { MiniApp, MiniAppState } from '@/contexts/MiniAppContext';
@@ -18,6 +18,7 @@ type Props = {
     appRefs: RefObject<Record<string, HTMLDivElement | null>>;
     onOpen: (event: MouseEvent<HTMLAnchorElement>, app: MiniApp) => void;
     hasWallpaper: boolean;
+    alignment: HomeAppsAlignment;
 };
 
 type Gesture = {
@@ -35,11 +36,13 @@ type Gesture = {
 
 const holdDuration = 450;
 
-export default function HomeApps({ apps, miniAppState, appRefs, onOpen, hasWallpaper }: Props) {
+export default function HomeApps({ apps, miniAppState, appRefs, onOpen, hasWallpaper, alignment }: Props) {
     const { t } = useTranslation();
     const { user, getUser } = useAuth();
     const [draft, setDraft] = useState<HomeAppPath[] | null>(null);
     const [dragging, setDragging] = useState<HomeAppPath | null>(null);
+    const [dropTarget, setDropTarget] = useState({ x: 0, y: 0 });
+    const [landing, setLanding] = useState<HomeAppPath | null>(null);
     const [isPending, setIsPending] = useState(false);
     const [feedback, setFeedback] = useState<{
         error?: string;
@@ -52,6 +55,9 @@ export default function HomeApps({ apps, miniAppState, appRefs, onOpen, hasWallp
     const mounted = useRef(true);
     const x = useMotionValue(0);
     const y = useMotionValue(0);
+    const horizontalVelocity = useVelocity(x);
+    const targetTilt = useTransform(horizontalVelocity, [-1200, 0, 1200], [-12, 0, 12]);
+    const tilt = useSpring(targetTilt, { stiffness: 300, damping: 25 });
     const reduceMotion = useReducedMotion();
     const orderedApps = draft ? [...apps].sort((a, b) => draft.indexOf(a.path) - draft.indexOf(b.path)) : apps;
     const floatingApp = apps.find((app) => app.path === dragging);
@@ -133,6 +139,12 @@ export default function HomeApps({ apps, miniAppState, appRefs, onOpen, hasWallp
             suppressClickUntil.current = Date.now() + 500;
         }
 
+        const slot = gesture.slots[gesture.order.indexOf(gesture.path)];
+        if (gesture.active && slot) {
+            setDropTarget({ x: slot.left, y: slot.top });
+            setLanding(gesture.path);
+        }
+
         setDragging(null);
 
         return gesture;
@@ -201,6 +213,7 @@ export default function HomeApps({ apps, miniAppState, appRefs, onOpen, hasWallp
     function startPress(event: PointerEvent<HTMLAnchorElement>, path: HomeAppPath) {
         if (
             savingRef.current ||
+            landing ||
             miniAppState ||
             !user ||
             !event.isPrimary ||
@@ -234,9 +247,11 @@ export default function HomeApps({ apps, miniAppState, appRefs, onOpen, hasWallp
 
                 suppressClickUntil.current = Infinity;
 
-                x.set(gesture.startX - gesture.offsetX);
+                x.jump(gesture.startX - gesture.offsetX);
 
-                y.set(gesture.startY - gesture.offsetY);
+                y.jump(gesture.startY - gesture.offsetY);
+
+                tilt.jump(0);
 
                 gridRef.current.setPointerCapture(gesture.id);
 
@@ -356,7 +371,7 @@ export default function HomeApps({ apps, miniAppState, appRefs, onOpen, hasWallp
                 }}
                 aria-label={t('home.applications')}
                 aria-busy={isPending}
-                className="flex flex-wrap justify-center gap-6 sm:gap-8"
+                className={cn('flex flex-wrap gap-4 sm:gap-8', alignment === 'left' ? 'justify-start' : 'justify-center')}
             >
                 {orderedApps.map((app) => (
                     <motion.div
@@ -368,7 +383,7 @@ export default function HomeApps({ apps, miniAppState, appRefs, onOpen, hasWallp
                             stiffness: 450,
                             damping: 35
                         }}
-                        className="w-24"
+                        className='w-24'
                     >
                         <Link
                             to={app.path}
@@ -414,7 +429,7 @@ export default function HomeApps({ apps, miniAppState, appRefs, onOpen, hasWallp
                             className={cn(
                                 'group flex w-24 touch-none select-none flex-col items-center gap-3 text-center focus-visible:outline-2 focus-visible:outline-theme-accent',
                                 {
-                                    'opacity-0': app.path === miniAppState?.path,
+                                    'opacity-0': app.path === miniAppState?.path || app.path === landing,
                                     'animate-pulse': !!miniAppState && app.path !== miniAppState.path,
                                     'opacity-20': dragging === app.path
                                 }
@@ -443,19 +458,28 @@ export default function HomeApps({ apps, miniAppState, appRefs, onOpen, hasWallp
                     </motion.div>
                 ))}
             </div>
-            {floatingApp &&
-                createPortal(
-                    <motion.div
+            {createPortal(
+                <AnimatePresence custom={dropTarget} onExitComplete={() => setLanding(null)}>
+                    {floatingApp && <motion.div
+                        key={floatingApp.path}
                         aria-hidden
                         data-dragging-app={floatingApp.path}
                         initial={{
-                            scale: 1,
-                            rotate: 0
+                            scale: 1
                         }}
                         animate={{
-                            scale: reduceMotion ? 1 : 1.12,
-                            rotate: reduceMotion ? 0 : -4
+                            scale: reduceMotion ? 1 : 1.12
                         }}
+                        exit='drop'
+                        variants={{ drop: (target: { x: number; y: number }) => ({
+                            x: target.x,
+                            y: target.y,
+                            scale: 1,
+                            rotate: 0,
+                            transition: reduceMotion
+                                ? { duration: 0 }
+                                : { type: 'spring', stiffness: 450, damping: 30 }
+                        }) }}
                         transition={{
                             type: 'spring',
                             stiffness: 450,
@@ -463,7 +487,8 @@ export default function HomeApps({ apps, miniAppState, appRefs, onOpen, hasWallp
                         }}
                         style={{
                             x,
-                            y
+                            y,
+                            rotate: reduceMotion ? 0 : tilt
                         }}
                         className="pointer-events-none fixed top-0 left-0 z-200 flex w-24 flex-col items-center gap-3 text-center font-mono"
                     >
@@ -473,9 +498,10 @@ export default function HomeApps({ apps, miniAppState, appRefs, onOpen, hasWallp
                         <span className="max-w-full bg-theme-surface/95 px-2 py-1 text-xs font-semibold text-theme-text">
                             {floatingApp.name}
                         </span>
-                    </motion.div>,
-                    document.body
-                )}
+                    </motion.div>}
+                </AnimatePresence>,
+                document.body
+            )}
         </div>
     );
 }

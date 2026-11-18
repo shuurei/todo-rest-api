@@ -3,7 +3,7 @@ import { mkdir, writeFile, unlink, access } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import sharp from 'sharp';
-import { isHomeWallpaperId } from '@todo/shared';
+import { isHomeWallpaperId } from '@nodus/shared';
 
 export const imageDirectory = fileURLToPath(new URL('../../uploads/images/', import.meta.url));
 

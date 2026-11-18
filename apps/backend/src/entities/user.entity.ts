@@ -1,5 +1,5 @@
 import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { defaultUserPreferences, type UserPreferences } from '@todo/shared';
+import { defaultUserPreferences, type UserPreferences } from '@nodus/shared';
 import { Session } from './session.entity';
 import { Todo } from './todo.entity';
 

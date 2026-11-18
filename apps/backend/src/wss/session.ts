@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { GatewayCloseCode as Close, GatewayOpcode as Op, type GatewayDispatchData } from '@todo/shared';
+import { GatewayCloseCode as Close, GatewayOpcode as Op, type GatewayDispatchData } from '@nodus/shared';
 import type { GatewaySocket } from './socket';
 
 interface SessionOptions {

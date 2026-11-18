@@ -78,7 +78,7 @@ export default function AuthLayout() {
                                         >
                                             <LuChevronLeft />
                                         </button>
-                                        <span className='text-[10px] uppercase tracking-[0.2em] text-theme-muted'>
+                                        <span className='text-2xs uppercase tracking-[0.2em] text-theme-muted'>
                                             <ScrambleText
                                                 text={isHome ? user. username: (apps.find((app) => app.path === miniAppState?.path)?.name ?? '??')}
                                                 duration={850}

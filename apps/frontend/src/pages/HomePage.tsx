@@ -2,12 +2,12 @@ import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router'
 import { AnimatePresence, motion } from 'motion/react'
 import { useWindowSize } from '@/hooks/useWindowSize'
+import { useWallpaperField } from '@/hooks/useWallpaperField'
 import { useMiniApp, type MiniApp } from '@/contexts/MiniAppContext'
-import HomeApps from '@/components/HomeApps'
+import HomeContent from '@/components/HomeContent'
 import HomeWallpaper from '@/components/HomeWallpaper'
-import HomeWidgets from '@/components/HomeWidgets'
 import { useAuth } from '@/contexts/AuthContext'
-import { defaultUserPreferences } from '@todo/shared'
+import { defaultUserPreferences } from '@nodus/shared'
 
 export default function HomePage() {
     const navigate = useNavigate();
@@ -15,6 +15,8 @@ export default function HomePage() {
     const { centerX, centerY, widthScreen, heightScreen } = useWindowSize();
     const { user } = useAuth();
     const settings = user?.preferences ?? defaultUserPreferences;
+    const wallpaperField = useWallpaperField(settings.homeWallpaperMode);
+    const activeWallpaper = settings[wallpaperField];
     const appRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
     useEffect(() => {
@@ -31,7 +33,7 @@ export default function HomePage() {
 
         openMiniApp({
             ...app,
-            origin: event.currentTarget.getBoundingClientRect()
+            origin: appRefs.current[app.path]?.getBoundingClientRect() ?? event.currentTarget.getBoundingClientRect()
         });
     };
     
@@ -46,22 +48,15 @@ export default function HomePage() {
     };
 
     return (
-        <section className='relative isolate flex h-full flex-col gap-8 overflow-y-auto p-6 font-mono text-theme-text'>
-            <HomeWallpaper wallpaper={settings.homeWallpaper} blur={settings.homeWallpaperBlur} />
+        <section className='relative isolate h-full min-h-0 overflow-y-auto p-3 font-mono text-theme-text sm:p-6'>
+            <HomeWallpaper wallpaper={activeWallpaper} blur={settings.homeWallpaperBlur} />
 
-            <HomeWidgets
-                showClock={settings.homeShowClock}
-                showWeather={settings.homeShowWeather}
-                weatherLocation={settings.homeWeatherLocation}
-                hasWallpaper={!!settings.homeWallpaper}
-            />
-
-            <HomeApps
+            <HomeContent
                 apps={apps}
                 miniAppState={miniAppState}
                 appRefs={appRefs}
                 onOpen={handleOpenMiniApp}
-                hasWallpaper={!!settings.homeWallpaper}
+                settings={{ ...settings, homeWallpaper: activeWallpaper }}
             />
 
             <AnimatePresence>

@@ -95,7 +95,7 @@ const SessionCard = ({ session, isPending, isConfirming, onRevoke, onConfirm, on
                 <div className='flex items-center justify-between'>
                     <h2 className="text-sm">{describeDevice(session.userAgent) || t('devices.unknown')}</h2>
                     {session.isCurrent && (
-                        <span className="self-start border border-theme-accent/40 px-2 py-1 text-[10px] uppercase tracking-wider text-theme-highlight">{t('devices.current')}</span>
+                        <span className="self-start border border-theme-accent/40 px-2 py-1 text-2xs uppercase tracking-wider text-theme-highlight">{t('devices.current')}</span>
                     )}
                 </div>
 

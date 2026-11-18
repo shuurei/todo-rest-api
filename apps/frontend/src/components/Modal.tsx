@@ -25,7 +25,7 @@ Modal.Footer = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivE
         <div
             {...props}
             className={cn(
-                'flex border-t text-theme-dim border-theme-border/30 text-[10px] px-5 py-3 tracking-widest',
+                'flex border-t text-theme-dim border-theme-border/30 text-2xs px-5 py-3 tracking-widest',
                 className
             )}
         >

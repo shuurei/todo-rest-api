@@ -23,7 +23,7 @@ export default function PasswordInput({
 
     return (
         <div className="space-y-3">
-            <label className="text-xs font-bold uppercase tracking-widest text-theme-highlight">
+            <label className="flex flex-col gap-2 text-xs font-bold uppercase tracking-widest text-theme-highlight">
                 <ScrambleText text={label} duration={5000} />
 
                 <div className="relative">

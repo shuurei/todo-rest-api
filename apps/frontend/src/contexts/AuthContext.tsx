@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { normalizeUserPreferences } from '@todo/shared'
+import { normalizeUserPreferences } from '@nodus/shared'
 import type { User } from '@/types/user'
 import { useGateway } from '@/hooks/useGateway'
 

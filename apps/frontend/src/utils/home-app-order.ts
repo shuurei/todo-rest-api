@@ -1,4 +1,4 @@
-import type { HomeAppPath } from '@todo/shared';
+import type { HomeAppPath } from '@nodus/shared';
 
 export interface AppSlot {
     left: number;

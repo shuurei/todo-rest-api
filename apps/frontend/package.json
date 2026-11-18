@@ -1,7 +1,8 @@
 {
-	"name": "frontend",
-	"private": true,
+	"name": "@nodus/frontend",
 	"version": "0.0.0",
+	"description": "Nodus web application",
+	"private": true,
 	"type": "module",
 	"scripts": {
 		"dev": "vite --host",
@@ -10,8 +11,8 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@nodus/shared": "workspace:*",
 		"@tailwindcss/vite": "^4.3.3",
-		"@todo/shared": "workspace:*",
 		"axios": "^1.21.0",
 		"clsx": "^2.1.1",
 		"culori": "^4.0.2",

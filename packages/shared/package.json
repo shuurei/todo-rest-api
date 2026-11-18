@@ -1,6 +1,7 @@
 {
-    "name": "@todo/shared",
+    "name": "@nodus/shared",
     "version": "0.0.0",
+    "description": "Shared types, preferences and gateway protocol for Nodus",
     "private": true,
     "type": "module",
     "exports": {

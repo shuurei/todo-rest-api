@@ -1,4 +1,4 @@
-import { normalizeUserPreferences } from '@todo/shared';
+import { normalizeUserPreferences } from '@nodus/shared';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { UserPolicy } from '../../policies/user.policy';

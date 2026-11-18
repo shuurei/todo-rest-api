@@ -26,7 +26,7 @@ export default {
         admin: 'Admin'
     },
     connection: {
-        unavailable: 'Serveur indisponible',
+        unavailable: 'Les serveurs sont injoignables',
         fatal: 'Connexion interrompue (code {{code}}). Vérifiez la configuration ou rechargez l’application.',
         reload: 'Recharger',
         description:
@@ -37,8 +37,11 @@ export default {
     },
     auth: {
         loginProtocol: 'Protocole de connexion',
+        logoutProtocol: 'Protocole de déconnexion',
+        reconnectProtocol: 'Reconnexion',
         registerProtocol: 'Protocole d’inscription',
         online: 'Système en ligne',
+        offline: 'Système hors ligne',
         usernamePlaceholder: 'nom d’utilisateur',
         initializeSession: 'Ouvrir la session',
         createIdentity: 'Créer une identité',
@@ -88,6 +91,8 @@ export default {
     },
     home: {
         applications: 'Applications',
+        clock: 'Horloge',
+        weather: 'Météo',
         dateTime: 'Date et heure',
         dragHelp:
             'Maintenez une application appuyée, déplacez-la puis relâchez pour enregistrer sa position. Au clavier : Alt + flèches pour déplacer, Échap pour annuler le glissement.',
@@ -98,12 +103,39 @@ export default {
         title: 'Écran d’accueil',
         categoryDescription: "Fond d'écran, widgets et ordre des applications",
         wallpaper: 'Fond d’écran',
+        wallpaperMode: 'Mode des fonds d’écran',
+        wallpaperEverywhere: 'Commun',
+        wallpaperSplit: 'Par écran',
+        wallpaperModeHelp: 'Commun : une image pour tous les écrans. Par écran : Mobile sous 640 px, Tablette de 640 à 1023 px et Desktop dès 1024 px. Sans image, la couleur du thème de base est conservée.',
+        changeWallpaper: 'Changer l’image',
+        wallpaperFormats: {
+            homeWallpaper: 'Aperçu commun · image recadrée selon l’écran',
+            homeWallpaperDesktop: 'Paysage 16:9 · écran de 1024 px et plus',
+            homeWallpaperTablet: 'Portrait 3:4 · écran de 640 à 1023 px',
+            homeWallpaperMobile: 'Portrait 9:19,5 · écran de moins de 640 px'
+        },
+        wallpaperTargets: {
+            homeWallpaper: 'Commun',
+            homeWallpaperDesktop: 'Desktop',
+            homeWallpaperTablet: 'Tablette',
+            homeWallpaperMobile: 'Mobile'
+        },
         uploadImage: 'Importer une image',
         removeWallpaper: 'Supprimer',
         uploadHelp:
             'JPEG, PNG, WebP ou GIF, 10 Mo maximum. Stockage en JPEG haute qualité (GIF non animé). Sélectionnez une photo puis enregistrez : elle sera importée avec vos préférences. Les images sont accessibles à toute personne disposant du lien.',
         blur: 'Flou du fond',
         widgets: 'Widgets',
+        widgetPosition: 'Emplacement',
+        widgetSize: 'Taille',
+        appsAlignment: 'Placement des applications',
+        appsLeft: 'Toutes à gauche',
+        appsCenter: 'Centrées horizontalement',
+        positions: {
+            'top-left': 'En haut à gauche',
+            'top-center': 'En haut au centre',
+            'top-right': 'En haut à droite'
+        },
         showClock: 'Afficher la date et l’heure',
         showWeather: 'Afficher la météo',
         orderHelp:
@@ -168,15 +200,50 @@ export default {
         empty: 'Aucune session active.'
     },
     todo: {
-        title: 'Liste des tâches',
+        title: 'Mes tâches',
+        workspace: 'Espace personnel',
+        subtitle: 'Une chose à la fois.',
         titleLabel: 'Titre de la tâche',
-        titlePlaceholder: 'Saisir une tâche…',
-        createTask: 'Créer une tâche',
+        titlePlaceholder: 'Quelle est la prochaine étape ?',
+        titleHint: 'Le titre doit contenir entre 3 et 200 caractères.',
+        createTask: 'Ajouter une tâche',
+        add: 'Ajouter',
         tasks: 'Tâches',
         entries_one: '{{count}} entrée',
         entries_other: '{{count}} entrées',
-        noTasks: 'Aucune tâche',
-        firstObjective: 'Créez votre premier objectif'
+        progress: 'Progression',
+        filterLabel: 'Filtrer les tâches',
+        filters: { all: 'Toutes', active: 'À faire', completed: 'Terminées' },
+        sortLabel: 'Trier les tâches',
+        sorts: { newest: 'Plus récentes', oldest: 'Plus anciennes', alphabetical: 'De A à Z' },
+        search: 'Rechercher une tâche',
+        searchPlaceholder: 'Rechercher une tâche…',
+        clearSearch: 'Effacer la recherche',
+        resetFilters: 'Afficher toutes les tâches',
+        noTasks: 'Tout commence par une première tâche.',
+        firstObjective: 'Notez votre prochaine idée, action ou objectif.',
+        noResults: 'Aucune tâche correspondante.',
+        searchHelp: 'Essayez un autre mot ou affichez toutes vos tâches.',
+        allDone: 'Tout est à jour.',
+        allDoneHelp: 'Aucune tâche à faire pour le moment. Profitez de cette pause.',
+        noCompleted: 'Pas encore de tâche terminée.',
+        noCompletedHelp: 'Vos tâches terminées apparaîtront ici.',
+        completeTask: 'Terminer : {{title}}',
+        reopenTask: 'Remettre à faire : {{title}}',
+        editTask: 'Modifier : {{title}}',
+        deleteTask: 'Supprimer : {{title}}',
+        clearCompleted: 'Supprimer les terminées',
+        deleteTitle: 'Supprimer cette tâche ?',
+        deleteConfirm: '« {{title}} » sera supprimée.',
+        deleteCompletedTitle: 'Supprimer les tâches terminées ?',
+        deleteCompletedConfirm_one: 'La tâche terminée sélectionnée sera supprimée.',
+        deleteCompletedConfirm_other: 'Les {{count}} tâches terminées sélectionnées seront supprimées.',
+        deleteWarning: 'Cette action est définitive.',
+        retry: 'Réessayer',
+        feedback: {
+            created: 'Tâche ajoutée.', updated: 'Tâche modifiée.', completed: 'Tâche terminée.', reopened: 'Tâche remise à faire.',
+            deleted_one: 'Une tâche supprimée.', deleted_other: '{{count}} tâches supprimées.'
+        }
     },
     account: {
         displayName: 'Nom affiché',

@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { createContext, useContext, useMemo, useState } from 'react'
 import type { IconType } from 'react-icons'
 import { useTranslation } from 'react-i18next'
-import { hasFlag, UserFlags, defaultUserPreferences, type HomeAppPath } from '@todo/shared'
+import { hasFlag, UserFlags, defaultUserPreferences, type HomeAppPath } from '@nodus/shared'
 import { LuCheck, LuShieldCheck, LuSlidersHorizontal } from 'react-icons/lu'
 
 export interface MiniApp {

@@ -1,6 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { supportedLanguages, type Language } from '@todo/shared';
+import { supportedLanguages, type Language } from '@nodus/shared';
 import en from './en';
 import fr from './fr';
 

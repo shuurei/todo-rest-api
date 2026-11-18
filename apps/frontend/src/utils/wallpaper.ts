@@ -1,4 +1,4 @@
-import { isHomeWallpaperId } from '@todo/shared';
+import { isHomeWallpaperId } from '@nodus/shared';
 import { api } from '@/utils/axios';
 
 export const maxWallpaperBytes = 10 * 1024 * 1024;

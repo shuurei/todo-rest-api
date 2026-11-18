@@ -1,1 +1,1 @@
-export type { GatewayTodo as Todo } from '@todo/shared';
+export type { GatewayTodo as Todo } from '@nodus/shared';

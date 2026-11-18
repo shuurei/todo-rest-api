@@ -3,7 +3,7 @@ import {
     GatewayCloseCode as Close,
     type GatewayDispatch,
     type GatewayServerPacket
-} from '@todo/shared';
+} from '@nodus/shared';
 import type { User } from '@/types/user';
 
 interface SocketHandlers {
@@ -54,9 +54,7 @@ export class GatewaySocket {
     }
 
     dispose(code = 1000) {
-        if (this.disposed) {
-            return;
-        }
+        if (this.disposed) return;
 
         this.disposed = true;
 
@@ -75,9 +73,7 @@ export class GatewaySocket {
     }
 
     private fail(code: number = Close.UnknownError, reason = '') {
-        if (this.disposed) {
-            return;
-        }
+        if (this.disposed) return;
 
         this.dispose();
 
@@ -97,9 +93,7 @@ export class GatewaySocket {
     }
 
     private tick = () => {
-        if (this.disposed) {
-            return;
-        }
+        if (this.disposed) return;
 
         this.heartbeat();
 
@@ -115,9 +109,7 @@ export class GatewaySocket {
     };
 
     private onMessage = (event: MessageEvent) => {
-        if (this.disposed) {
-            return;
-        }
+        if (this.disposed) return;
 
         this.lastMessage = Date.now();
 

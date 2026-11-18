@@ -1,5 +1,5 @@
 import z from 'zod';
-import { UserFlags } from '@todo/shared';
+import { UserFlags } from '@nodus/shared';
 import { updateUserSchema } from './user.schema';
 
 const knownFlags = Object.values(UserFlags).reduce((mask, flag) => mask | flag, 0);

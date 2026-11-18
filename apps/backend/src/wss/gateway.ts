@@ -1,4 +1,4 @@
-import { GatewayOpcode as Op, GatewayCloseCode as Close, gatewayVersion } from '@todo/shared';
+import { GatewayOpcode as Op, GatewayCloseCode as Close, gatewayVersion } from '@nodus/shared';
 import type { Server, IncomingMessage } from 'node:http';
 import { WebSocketServer, type WebSocket } from 'ws';
 import { allowedOrigins } from '../middlewares/csrf.middleware';

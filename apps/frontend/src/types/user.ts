@@ -1,4 +1,4 @@
-import type { UserPreferences } from '@todo/shared';
+import type { UserPreferences } from '@nodus/shared';
 
 export interface User {
     id: string;

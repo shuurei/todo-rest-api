@@ -15,5 +15,6 @@
 		"skipLibCheck": true,
 		"emitDecoratorMetadata": true,
         "experimentalDecorators": true
-	}
+	},
+	"include": ["src/**/*.ts", "types/**/*.d.ts"]
 }

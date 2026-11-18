@@ -2,7 +2,7 @@ import type { ApiResponse } from '@/types/api';
 import type { User } from '@/types/user';
 import { api } from '@/utils/axios';
 import { Gateway as gateway } from '@/utils/gateway';
-import type { GatewaySession } from '@todo/shared';
+import type { GatewaySession } from '@nodus/shared';
 
 export type UserSession = GatewaySession;
 
@@ -25,20 +25,27 @@ export class AuthAPI {
         return api;
     }
 
-    static async register(payload: RegisterPayload) {
-        const result = await api.post<ApiResponse<LoginResponseData>>('/auth/register', payload);
+    private static async authenticate(type: 'login' | 'register', payload: LoginPayload) {
+        const [result] = await Promise.allSettled([
+            api.post<ApiResponse<LoginResponseData>>(`/auth/${type}`, payload),
+            new Promise<void>((resolve) => setTimeout(resolve, 3000))
+        ]);
+
+        if (result.status === 'rejected') {
+            throw result.reason;
+        }
 
         gateway.reconnect();
 
-        return result;
+        return result.value;
+    }
+
+    static async register(payload: RegisterPayload) {
+        return this.authenticate('register', payload);
     }
 
     static async login(payload: LoginPayload) {
-        const result = await api.post<ApiResponse<LoginResponseData>>('/auth/login', payload);
-
-        gateway.reconnect();
-
-        return result;
+        return this.authenticate('login', payload);
     }
 
     static async getSessions(signal?: AbortSignal) {
@@ -62,7 +69,7 @@ export class AuthAPI {
     static async logout() {
         const result = await api.post<ApiResponse<User>>('/auth/logout');
 
-        gateway.reconnect();
+        gateway.reconnect('logout');
 
         return result;
     }

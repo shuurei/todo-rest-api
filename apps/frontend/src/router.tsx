@@ -1,18 +1,19 @@
-import { createBrowserRouter, Navigate } from 'react-router';
-import AuthLayout from './layouts/AuthLayout';
-import GuestLayout from './layouts/GuestLayout';
-import AuthPage from './pages/AuthPage';
-import TodoPage from './pages/TodoPage';
-import SettingsPage from './pages/settings/SettingsPage';
-import AppearancePage from './pages/settings/AppearancePage';
-import LanguagePage from './pages/settings/LanguagePage';
-import DevicesPage from './pages/settings/DevicesPage';
-import HomePage from './pages/HomePage';
-import HomeSettingsPage from './pages/settings/HomeSettingsPage';
-import AccountPage from './pages/settings/AccountPage';
-import SessionLayout from './layouts/SessionLayout';
-import NotFoundPage from './pages/NotFoundPage';
-import AdminPage from './pages/AdminPage';
+import { createBrowserRouter, Navigate } from 'react-router'
+
+import AuthLayout from './layouts/AuthLayout'
+import GuestLayout from './layouts/GuestLayout'
+
+import AuthPage from './pages/AuthPage'
+import TodoPage from './pages/TodoPage'
+import SettingsPage from './pages/settings/SettingsPage'
+import AppearancePage from './pages/settings/AppearancePage'
+import LanguagePage from './pages/settings/LanguagePage'
+import DevicesPage from './pages/settings/DevicesPage'
+import HomePage from './pages/HomePage'
+import HomeSettingsPage from './pages/settings/HomeSettingsPage'
+import AccountPage from './pages/settings/AccountPage'
+import SessionLayout from './layouts/SessionLayout'
+import AdminPage from './pages/AdminPage'
 
 const router = createBrowserRouter([
     {
@@ -50,7 +51,7 @@ const router = createBrowserRouter([
                     },
                     {
                         path: 'account',
-                        element: <Navigate to="/settings/account" replace />
+                        element: <Navigate to='/settings/account' replace />
                     },
                     {
                         path: 'settings',
@@ -58,7 +59,7 @@ const router = createBrowserRouter([
                         children: [
                             {
                                 index: true,
-                                element: <Navigate to="/settings/account" replace />
+                                element: <Navigate to='/settings/account' replace />
                             },
                             {
                                 path: 'account',
@@ -90,7 +91,7 @@ const router = createBrowserRouter([
             },
             {
                 path: '*',
-                element: <NotFoundPage />
+                element: <Navigate to='/' replace />
             }
         ]
     }

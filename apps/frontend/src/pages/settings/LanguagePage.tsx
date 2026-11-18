@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { defaultUserPreferences, type UserPreferences } from '@todo/shared'
+import { defaultUserPreferences, type UserPreferences } from '@nodus/shared'
 import { UserAPI } from '@/api/UserAPI'
 import { useAuth } from '@/contexts/AuthContext'
 import LanguageSelect from '@/components/common/LanguageSelect'

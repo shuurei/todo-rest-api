@@ -1,4 +1,4 @@
-import { type GatewaySession as DeviceSession } from '@todo/shared';
+import { type GatewaySession as DeviceSession } from '@nodus/shared';
 import { AuthService } from '../../services/auth.service';
 import { emitGatewayEvent, type ServiceEvent } from '../events';
 import type { GatewaySession } from '../session';

@@ -4,9 +4,18 @@ import {
     transitionSpeeds,
     supportedLanguages,
     homeAppPaths,
+    homeWidgetPositions,
+    homeWidgetSizes,
+    homeAppsAlignments,
+    homeWallpaperModes,
     isHomeWallpaperId,
     maxWallpaperBlur
-} from '@todo/shared';
+} from '@nodus/shared';
+
+const widgetLayoutSchema = z.strictObject({
+    position: z.enum(homeWidgetPositions),
+    size: z.enum(homeWidgetSizes)
+});
 
 export const updateUserPreferencesSchema = z
     .strictObject({
@@ -15,6 +24,10 @@ export const updateUserPreferencesSchema = z
         themeFromWallpaper: z.boolean().optional(),
         transitionDuration: z.union(transitionSpeeds.map((value) => z.literal(value))).optional(),
         homeWallpaper: z.string().refine(isHomeWallpaperId).nullable().optional(),
+        homeWallpaperMode: z.enum(homeWallpaperModes).optional(),
+        homeWallpaperDesktop: z.string().refine(isHomeWallpaperId).nullable().optional(),
+        homeWallpaperTablet: z.string().refine(isHomeWallpaperId).nullable().optional(),
+        homeWallpaperMobile: z.string().refine(isHomeWallpaperId).nullable().optional(),
         homeWallpaperBlur: z.number().int().min(0).max(maxWallpaperBlur).optional(),
         homeShowClock: z.boolean().optional(),
         homeShowWeather: z.boolean().optional(),
@@ -26,6 +39,9 @@ export const updateUserPreferencesSchema = z
             })
             .nullable()
             .optional(),
+        homeClockLayout: widgetLayoutSchema.optional(),
+        homeWeatherLayout: widgetLayoutSchema.optional(),
+        homeAppsAlignment: z.enum(homeAppsAlignments).optional(),
         appOrder: z
             .array(z.enum(homeAppPaths))
             .max(homeAppPaths.length)

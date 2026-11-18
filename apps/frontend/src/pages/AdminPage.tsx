@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Navigate, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { hasFlag, UserFlags } from '@todo/shared';
+import { hasFlag, UserFlags } from '@nodus/shared';
 import { LuPencil, LuShieldCheck, LuTrash2, LuUser } from 'react-icons/lu';
 import { AdminAPI, type UserSearchResponse, type UserStatus } from '@/api/AdminAPI';
 import UserEditor from '@/components/admin/UserEditor';
@@ -169,7 +169,7 @@ function AdminUsers() {
                         text={t('admin.title')}
                         className="mt-2 text-xl font-bold tracking-tight sm:text-2xl"
                     />
-                    <span className="text-[10px] uppercase tracking-widest text-theme-dim">{t('admin.adminOnly')}</span>
+                    <span className="text-2xs uppercase tracking-widest text-theme-dim">{t('admin.adminOnly')}</span>
                 </header>
 
                 <form
@@ -316,7 +316,7 @@ function AdminUsers() {
                 <div className="flex flex-col gap-3" aria-busy={isLoading}>
                     <div className="flex items-center justify-between gap-4 border-b border-theme-border/20 pb-3">
                         <h2 className="text-xs uppercase tracking-[0.2em] text-theme-muted">{t('admin.users')}</h2>
-                        <span className="text-[10px] text-theme-dim">
+                        <span className="text-2xs text-theme-dim">
                             {t('admin.results', {
                                 count: result.meta.total
                             })}

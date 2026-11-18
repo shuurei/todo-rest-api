@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LuCloud, LuCloudLightning, LuCloudRain, LuSnowflake, LuSun } from 'react-icons/lu'
 import { getWeather, weatherCondition, weatherRefreshInterval, type WeatherData } from '@/utils/weather'
-import type { WeatherLocation } from '@todo/shared'
+import type { WeatherLocation } from '@nodus/shared'
 
 interface WeatherWidgetProps {
     location: WeatherLocation;

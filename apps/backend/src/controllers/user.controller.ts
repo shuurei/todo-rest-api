@@ -4,6 +4,7 @@ import { UpdateUserInput } from '../validators/user.schema';
 import type { UpdateUserPreferencesInput } from '../validators/user-preferences.schema';
 import { clearSessionCookie } from '../utils/session';
 import { storeImage, removeImage, imageExists } from '../utils/image';
+import { homeWallpaperFields } from '@nodus/shared';
 
 export class UserController {
     static async show(
@@ -42,24 +43,26 @@ export class UserController {
         >,
         res: Response
     ) {
-        let uploadedId: string | null = null;
+        const uploadedIds: string[] = [];
 
         try {
-            if (req.file) {
-                uploadedId = await storeImage(req.file.buffer);
-
-                req.body.homeWallpaper = uploadedId;
-            } else if (req.body.homeWallpaper) {
-                await imageExists(req.body.homeWallpaper);
+            const files = req.files && !Array.isArray(req.files) ? req.files : {};
+            for (const field of homeWallpaperFields) {
+                const file = files[field]?.[0];
+                if (file) {
+                    const id = await storeImage(file.buffer);
+                    uploadedIds.push(id);
+                    req.body[field] = id;
+                } else if (req.body[field]) {
+                    await imageExists(req.body[field]);
+                }
             }
 
             return res.status(200).json({
                 data: await UserService.updatePreferences(req.params.userId, req.body)
             });
         } catch (error) {
-            if (uploadedId) {
-                await removeImage(uploadedId).catch(console.error);
-            }
+            await Promise.all(uploadedIds.map((id) => removeImage(id).catch(console.error)));
 
             throw error;
         }

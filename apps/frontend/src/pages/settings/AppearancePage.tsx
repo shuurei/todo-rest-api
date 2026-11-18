@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { defaultUserPreferences, normalizeTransitionDuration, themeColors, transitionSpeeds, type ThemeColor, type UserPreferences } from '@todo/shared'
+import { defaultUserPreferences, normalizeTransitionDuration, themeColors, transitionSpeeds, type ThemeColor, type HomeWallpaperField, type UserPreferences } from '@nodus/shared'
 import { UserAPI } from '@/api/UserAPI'
 import { useAuth } from '@/contexts/AuthContext'
 import { useThemePreview } from '@/contexts/ThemeContext'
@@ -10,14 +10,15 @@ import { Controller, useForm, useWatch, type UseFormRegisterReturn } from 'react
 import ScrambleText from '@/components/ScrambleText'
 import { extractImagePalette, type ImagePalette } from '@/utils/image-palette'
 import { getWallpaperUrl } from '@/utils/wallpaper'
+import { useWallpaperField } from '@/hooks/useWallpaperField'
 
 interface AppearanceValues {
     theme: ThemeColor | 'auto';
     transitionDuration: UserPreferences['transitionDuration'];
 }
 
-const getAppearanceValues = (preferences: UserPreferences): AppearanceValues => ({
-    theme: preferences.homeWallpaper && preferences.themeFromWallpaper ? 'auto' : preferences.themeColor,
+const getAppearanceValues = (preferences: UserPreferences, field: HomeWallpaperField = 'homeWallpaper'): AppearanceValues => ({
+    theme: preferences[field] && preferences.themeFromWallpaper ? 'auto' : preferences.themeColor,
     transitionDuration: normalizeTransitionDuration(preferences.transitionDuration)
 });
 
@@ -37,15 +38,17 @@ interface ThemeChoiceProps {
     label: string;
     swatch: string;
     input: UseFormRegisterReturn<'theme'>;
+    checked: boolean;
 }
 
-const ThemeChoice = ({ value, label, swatch, input }: ThemeChoiceProps) => (
+const ThemeChoice = ({ value, label, swatch, input, checked }: ThemeChoiceProps) => (
     <label className='group flex cursor-pointer items-center gap-4 border border-theme-border/20 bg-theme-surface/40 p-4 hover:border-theme-border/50 has-checked:border-theme-accent has-checked:bg-theme-border/10'>
         <span aria-hidden className='size-6 shrink-0 border border-theme-muted/40' style={{ backgroundColor: swatch }} />
         <span className='min-w-0 flex-1 text-sm'>{label}</span>
         <input
             type='radio'
             value={value}
+            checked={checked}
             {...input}
             className='peer sr-only'
         />
@@ -53,12 +56,13 @@ const ThemeChoice = ({ value, label, swatch, input }: ThemeChoiceProps) => (
 );
 
 interface AppearanceSectionProps {
+    selectedTheme: AppearanceValues['theme'];
     fallbackTheme: ThemeColor;
     wallpaperUrl: string | null;
     input: UseFormRegisterReturn<'theme'>;
 }
 
-const AppearanceSection = ({ fallbackTheme, wallpaperUrl, input }: AppearanceSectionProps) => {
+const AppearanceSection = ({ selectedTheme, fallbackTheme, wallpaperUrl, input }: AppearanceSectionProps) => {
     const { t } = useTranslation();
     const [result, setResult] = useState<{ source: string; palette: ImagePalette | null } | null>(null);
 
@@ -91,6 +95,7 @@ const AppearanceSection = ({ fallbackTheme, wallpaperUrl, input }: AppearanceSec
                 {wallpaperUrl && (
                     <ThemeChoice
                         value='auto'
+                        checked={selectedTheme === 'auto'}
                         label={t('settings.theme.auto')}
                         swatch={autoSwatch}
                         input={input}
@@ -101,6 +106,7 @@ const AppearanceSection = ({ fallbackTheme, wallpaperUrl, input }: AppearanceSec
                     <ThemeChoice
                         key={color}
                         value={color}
+                        checked={selectedTheme === color}
                         label={t(`settings.theme.${color}`)}
                         swatch={themeSwatches[color]}
                         input={input}
@@ -152,11 +158,12 @@ const AnimationsSection = ({ duration, onChange }: AnimationsSectionProps) => {
 const AppearancePage = () => {
     const { t } = useTranslation();
     const { user, getUser } = useAuth();
+    const wallpaperField = useWallpaperField(user!.preferences.homeWallpaperMode);
     const { register, control, handleSubmit, reset, formState: { isDirty, isSubmitting, defaultValues: savedValues } } = useForm<AppearanceValues>({
-        defaultValues: getAppearanceValues(user!.preferences)
+        defaultValues: getAppearanceValues(user!.preferences, wallpaperField)
     });
     const [theme, transitionDuration] = useWatch({ control, name: ['theme', 'transitionDuration'] });
-    const wallpaperUrl = getWallpaperUrl(user!.preferences.homeWallpaper);
+    const wallpaperUrl = getWallpaperUrl(user!.preferences[wallpaperField]);
     const isDefault = theme === defaultValues.theme && transitionDuration === defaultValues.transitionDuration;
     const hasSavedChanges = savedValues?.theme !== defaultValues.theme
         || savedValues?.transitionDuration !== defaultValues.transitionDuration;
@@ -173,7 +180,7 @@ const AppearancePage = () => {
                 themeFromWallpaper: !!wallpaperUrl && values.theme === 'auto',
                 transitionDuration: values.transitionDuration
             });
-            if (getUser()?.id === user!.id) reset(getAppearanceValues(data));
+            if (getUser()?.id === user!.id) reset(getAppearanceValues(data, wallpaperField));
         } catch (failure) {
             console.error('Failed to save appearance', failure);
         }
@@ -184,6 +191,7 @@ const AppearancePage = () => {
             <h1 className='text-xl font-bold tracking-tight'>{t('settings.appearance')}</h1>
             <SettingsForm isPending={isSubmitting} onSubmit={handleSubmit(saveAppearance)}>
                 <AppearanceSection
+                    selectedTheme={theme === 'auto' && !wallpaperUrl ? user!.preferences.themeColor : theme}
                     fallbackTheme={user!.preferences.themeColor}
                     wallpaperUrl={wallpaperUrl}
                     input={register('theme')}

@@ -1,4 +1,4 @@
-import type { GatewayReady } from '@todo/shared';
+import type { GatewayReady } from '@nodus/shared';
 import type { ServiceEvent } from '../events';
 import type { GatewaySession } from '../session';
 

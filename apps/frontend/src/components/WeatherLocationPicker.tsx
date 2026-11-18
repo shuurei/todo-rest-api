@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { WeatherLocation } from '@todo/shared'
+import type { WeatherLocation } from '@nodus/shared'
 import TextInput from '@/components/common/TextInput'
 import { searchWeatherLocations } from '@/utils/weather'
 
