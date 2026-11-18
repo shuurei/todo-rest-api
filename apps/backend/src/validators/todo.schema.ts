@@ -6,7 +6,8 @@ export const createTodoSchema = z.object({
 
 export const updateTodoSchema = z.object({
     isCompleted: z.boolean().optional(),
-    title: z.string().trim().min(3).max(200).optional()
+    title: z.string().trim().min(3).max(200).optional(),
+    createdAt: z.iso.datetime().transform((value) => new Date(value)).optional()
 });
 
 export type CreateTodoInput = z.infer<typeof createTodoSchema>;

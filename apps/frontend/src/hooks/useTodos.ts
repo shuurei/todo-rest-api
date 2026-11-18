@@ -134,7 +134,7 @@ export function useTodos() {
                 if (mounted.current) setIsCreating(false);
             }
         },
-        update: (id: string, payload: Pick<Partial<Todo>, 'title' | 'isCompleted'>) => mutate(id, async () => {
+        update: (id: string, payload: Pick<Partial<Todo>, 'title' | 'isCompleted' | 'createdAt'>) => mutate(id, async () => {
             const { data } = await TodoAPI.update(id, payload);
             return data;
         }),

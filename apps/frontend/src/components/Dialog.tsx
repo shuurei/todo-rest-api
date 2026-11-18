@@ -49,7 +49,7 @@ export default function Dialog({
                     onClose();
                 }
             }}
-            className="fixed inset-0 m-0 h-dvh max-h-dvh w-screen max-w-none flex-col overflow-hidden border border-theme-border/30 bg-theme-surface p-0 font-mono text-theme-text shadow-2xl backdrop:bg-black/70 open:flex sm:m-auto sm:h-auto sm:max-h-[90dvh] sm:w-[calc(100%_-_3rem)] sm:max-w-xl"
+            className="fixed inset-0 m-0 h-dvh max-h-dvh w-screen max-w-none flex-col overflow-hidden border border-theme-border/30 bg-theme-surface p-0 font-mono text-theme-text shadow-2xl backdrop:bg-black/70 open:flex sm:inset-auto sm:left-1/2 sm:top-1/2 sm:h-auto sm:max-h-[90dvh] sm:w-[calc(100%_-_3rem)] sm:max-w-xl sm:-translate-x-1/2 sm:-translate-y-1/2"
         >
             <header className="flex shrink-0 items-center justify-between gap-4 border-b border-theme-border/20 px-5 py-4">
                 <h2 id={titleId} className="min-w-0 text-base font-bold sm:text-lg">
@@ -65,7 +65,7 @@ export default function Dialog({
                     <LuX aria-hidden size={22} />
                 </button>
             </header>
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto sm:flex-initial">{children}</div>
         </dialog>,
         document.body
     );
